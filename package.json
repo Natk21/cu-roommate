@@ -12,5 +12,9 @@
         "turbo": "latest"
     },
     "packageManager": "pnpm@8.6.10",
-    "name": "full-stack"
+    "name": "full-stack",
+    "dependencies": {
+        "@tailwindcss/vite": "^4.1.17",
+        "dotenv": "^17.2.3"
+    }
 }

@@ -1,7 +1,7 @@
 type ProfileCardProps = {
     name: String,
     major: String,
-    graduationYear: Number,
+    graduationYear: number,
 }
 
 function ProfileCard({name, major, graduationYear}: ProfileCardProps) {
