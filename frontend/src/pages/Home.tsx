@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Menu, X, Shield, Heart, MessageCircle } from 'lucide-react';
 import ProfileCard from '../components/ProfileCard';
+import './index.css'
+
 
 const profiles = [
   { id: 1, name: "Max Shi", major: "Computer Science", graduationYear: 2029 },
