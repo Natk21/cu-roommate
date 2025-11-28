@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Menu, X, Shield, Heart, MessageCircle } from 'lucide-react';
 import ProfileCard from '../components/ProfileCard';
 import './index.css'
+import { Link } from 'react-router-dom';
 
 
 const profiles = [
@@ -34,9 +35,9 @@ const HomePage = () => {
               <a href="#home" className="text-gray-700 hover:text-red-700 transition-colors font-medium">Home</a>
               <a href="#matches" className="text-gray-700 hover:text-red-700 transition-colors font-medium">Matches</a>
               <a href="#about" className="text-gray-700 hover:text-red-700 transition-colors font-medium">About</a>
-              <button className="bg-gradient-to-r from-red-700 to-red-800 text-white px-6 py-2 rounded-lg hover:from-red-800 hover:to-red-900 transition-all shadow-md hover:shadow-lg font-medium">
+              <Link to = '/survey' className="bg-gradient-to-r from-red-700 to-red-800 text-white px-6 py-2 rounded-lg hover:from-red-800 hover:to-red-900 transition-all shadow-md hover:shadow-lg font-medium">
                 Get Started
-              </button>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}

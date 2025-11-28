@@ -8,7 +8,11 @@ export default {
     "./src/layouts/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        customRed: "#B13B1B",
+      },
+    },
   },
   plugins: [],
-}
+};
