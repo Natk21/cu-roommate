@@ -1,9 +1,8 @@
-import { useState } from 'react';
-import { Menu, X, Shield, Heart, MessageCircle } from 'lucide-react';
-import ProfileCard from '../components/ProfileCard';
-import './index.css'
-import { Link } from 'react-router-dom';
-
+import { useState } from "react";
+import { Menu, X, Shield, Heart, MessageCircle } from "lucide-react";
+import ProfileCard from "../components/ProfileCard";
+import "./index.css";
+import { Link } from "react-router-dom";
 
 const profiles = [
   { id: 1, name: "Max Shi", major: "Computer Science", graduationYear: 2029 },
@@ -32,10 +31,28 @@ const HomePage = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#home" className="text-gray-700 hover:text-red-700 transition-colors font-medium">Home</a>
-              <a href="#matches" className="text-gray-700 hover:text-red-700 transition-colors font-medium">Matches</a>
-              <a href="#about" className="text-gray-700 hover:text-red-700 transition-colors font-medium">About</a>
-              <Link to = '/survey' className="bg-gradient-to-r from-red-700 to-red-800 text-white px-6 py-2 rounded-lg hover:from-red-800 hover:to-red-900 transition-all shadow-md hover:shadow-lg font-medium">
+              <a
+                href="#home"
+                className="text-gray-700 hover:text-red-700 transition-colors font-medium"
+              >
+                Home
+              </a>
+              <a
+                href="#matches"
+                className="text-gray-700 hover:text-red-700 transition-colors font-medium"
+              >
+                Matches
+              </a>
+              <a
+                href="#about"
+                className="text-gray-700 hover:text-red-700 transition-colors font-medium"
+              >
+                About
+              </a>
+              <Link
+                to="/survey"
+                className="bg-gradient-to-r from-red-700 to-red-800 text-white px-6 py-2 rounded-lg hover:from-red-800 hover:to-red-900 transition-all shadow-md hover:shadow-lg font-medium"
+              >
                 Get Started
               </Link>
             </div>
@@ -54,9 +71,24 @@ const HomePage = () => {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100">
             <div className="px-4 pt-2 pb-4 space-y-2">
-              <a href="#home" className="block py-2 text-gray-700 hover:text-red-700 font-medium">Home</a>
-              <a href="#matches" className="block py-2 text-gray-700 hover:text-red-700 font-medium">Matches</a>
-              <a href="#about" className="block py-2 text-gray-700 hover:text-red-700 font-medium">About</a>
+              <a
+                href="#home"
+                className="block py-2 text-gray-700 hover:text-red-700 font-medium"
+              >
+                Home
+              </a>
+              <a
+                href="#matches"
+                className="block py-2 text-gray-700 hover:text-red-700 font-medium"
+              >
+                Matches
+              </a>
+              <a
+                href="#about"
+                className="block py-2 text-gray-700 hover:text-red-700 font-medium"
+              >
+                About
+              </a>
               <button className="w-full bg-gradient-to-r from-red-700 to-red-800 text-white px-6 py-2 rounded-lg hover:from-red-800 hover:to-red-900 transition-all mt-2 font-medium">
                 Get Started
               </button>
@@ -68,7 +100,10 @@ const HomePage = () => {
       {/* --- YOUR ENTIRE JSX BELOW THIS IS UNCHANGED --- */}
 
       {/* Hero Section */}
-      <section id="home" className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <section
+        id="home"
+        className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+      >
         <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 via-transparent to-transparent"></div>
         <div className="max-w-7xl mx-auto relative">
           <div className="text-center max-w-4xl mx-auto">
@@ -79,8 +114,9 @@ const HomePage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-10 leading-relaxed">
-              Connect with compatible students who share your lifestyle, interests, and academic goals.
-              Making housing decisions easier, one match at a time.
+              Connect with compatible students who share your lifestyle,
+              interests, and academic goals. Making housing decisions easier,
+              one match at a time.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="bg-gradient-to-r from-red-700 to-red-800 text-white px-8 py-4 rounded-xl hover:from-red-800 hover:to-red-900 transition-all shadow-lg hover:shadow-xl font-semibold text-lg">
@@ -118,8 +154,12 @@ const HomePage = () => {
       <section id="matches" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Your Top Matches</h2>
-            <p className="text-lg text-gray-600">Students who match your preferences and lifestyle</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Your Top Matches
+            </h2>
+            <p className="text-lg text-gray-600">
+              Students who match your preferences and lifestyle
+            </p>
           </div>
 
           <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
@@ -140,8 +180,12 @@ const HomePage = () => {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Us?</h2>
-            <p className="text-lg text-gray-600">The smart way to find your ideal living situation</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Why Choose Us?
+            </h2>
+            <p className="text-lg text-gray-600">
+              The smart way to find your ideal living situation
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -149,9 +193,12 @@ const HomePage = () => {
               <div className="w-14 h-14 bg-red-100 rounded-xl mb-6 flex items-center justify-center">
                 <Shield className="text-red-700" size={28} />
               </div>
-              <h3 className="text-2xl font-bold mb-3 text-gray-900">Verified Profiles</h3>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                Verified Profiles
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                All users are verified Cornell students. Your safety and security are our top priorities.
+                All users are verified Cornell students. Your safety and
+                security are our top priorities.
               </p>
             </div>
 
@@ -159,9 +206,12 @@ const HomePage = () => {
               <div className="w-14 h-14 bg-red-100 rounded-xl mb-6 flex items-center justify-center">
                 <Heart className="text-red-700" size={28} />
               </div>
-              <h3 className="text-2xl font-bold mb-3 text-gray-900">Smart Matching</h3>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                Smart Matching
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                Our algorithm considers your lifestyle, schedule, and preferences to find the perfect match.
+                Our algorithm considers your lifestyle, schedule, and
+                preferences to find the perfect match.
               </p>
             </div>
 
@@ -169,9 +219,12 @@ const HomePage = () => {
               <div className="w-14 h-14 bg-red-100 rounded-xl mb-6 flex items-center justify-center">
                 <MessageCircle className="text-red-700" size={28} />
               </div>
-              <h3 className="text-2xl font-bold mb-3 text-gray-900">Easy Communication</h3>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                Easy Communication
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                Connect instantly with potential roommates through our built-in messaging system.
+                Connect instantly with potential roommates through our built-in
+                messaging system.
               </p>
             </div>
           </div>
@@ -182,8 +235,12 @@ const HomePage = () => {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-lg text-gray-600">Three simple steps to finding your perfect roommate</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              How It Works
+            </h2>
+            <p className="text-lg text-gray-600">
+              Three simple steps to finding your perfect roommate
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-12 relative">
@@ -193,9 +250,12 @@ const HomePage = () => {
               <div className="w-20 h-20 bg-gradient-to-br from-red-700 to-red-900 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg relative z-10">
                 <span className="text-3xl font-bold text-white">1</span>
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">Create Your Profile</h3>
+              <h3 className="text-xl font-bold mb-3 text-gray-900">
+                Create Your Profile
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                Share your interests, major, lifestyle preferences, and what you're looking for in a roommate.
+                Share your interests, major, lifestyle preferences, and what
+                you're looking for in a roommate.
               </p>
             </div>
 
@@ -203,9 +263,12 @@ const HomePage = () => {
               <div className="w-20 h-20 bg-gradient-to-br from-red-700 to-red-900 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg relative z-10">
                 <span className="text-3xl font-bold text-white">2</span>
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">Get Matched</h3>
+              <h3 className="text-xl font-bold mb-3 text-gray-900">
+                Get Matched
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                Our intelligent algorithm finds compatible roommates based on your unique preferences and habits.
+                Our intelligent algorithm finds compatible roommates based on
+                your unique preferences and habits.
               </p>
             </div>
 
@@ -213,9 +276,12 @@ const HomePage = () => {
               <div className="w-20 h-20 bg-gradient-to-br from-red-700 to-red-900 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg relative z-10">
                 <span className="text-3xl font-bold text-white">3</span>
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">Connect & Move In</h3>
+              <h3 className="text-xl font-bold mb-3 text-gray-900">
+                Connect & Move In
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                Chat with your matches, meet up, and find the perfect person to share your Cornell experience with.
+                Chat with your matches, meet up, and find the perfect person to
+                share your Cornell experience with.
               </p>
             </div>
           </div>
@@ -226,9 +292,12 @@ const HomePage = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-red-700 to-red-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
         <div className="max-w-4xl mx-auto text-center relative">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6 text-white">Ready to Find Your Perfect Roommate?</h2>
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6 text-white">
+            Ready to Find Your Perfect Roommate?
+          </h2>
           <p className="text-xl text-red-100 mb-10 leading-relaxed">
-            Join thousands of Cornell students who've found their ideal living situation through our platform.
+            Join thousands of Cornell students who've found their ideal living
+            situation through our platform.
           </p>
           <button className="bg-white text-red-700 px-10 py-4 rounded-xl hover:bg-gray-50 transition-all text-lg font-bold shadow-xl hover:shadow-2xl hover:scale-105">
             Get Started Today
@@ -243,32 +312,72 @@ const HomePage = () => {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-br from-red-700 to-red-900 rounded-lg"></div>
-                <span className="font-bold text-lg">Cornell Roommate Finder</span>
+                <span className="font-bold text-lg">
+                  Cornell Roommate Finder
+                </span>
               </div>
-              <p className="text-gray-400 text-sm">Connecting Cornell students for better living experiences.</p>
+              <p className="text-gray-400 text-sm">
+                Connecting Cornell students for better living experiences.
+              </p>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">How it works</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    How it works
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Pricing
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Contact
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Privacy
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Safety</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Safety
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Terms
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
