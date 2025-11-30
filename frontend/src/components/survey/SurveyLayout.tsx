@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 interface SurveyLayoutProps {
@@ -12,6 +12,13 @@ interface SurveyLayoutProps {
   isSubmitting?: boolean;
 }
 
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
 const SurveyLayout = ({
   title,
   currentStep,
@@ -22,6 +29,17 @@ const SurveyLayout = ({
   children,
   isSubmitting = false,
 }: SurveyLayoutProps) => {
+  useEffect(() => {
+    scrollToTop();
+  }, [currentStep]);
+
+  const handleNext = () => {
+    onNext();
+  };
+
+  const handleBack = () => {
+    onBack();
+  };
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -55,7 +73,7 @@ const SurveyLayout = ({
         <div className="flex justify-between">
           <button
             type="button"
-            onClick={onBack}
+            onClick={handleBack}
             disabled={currentStep === 1 || isSubmitting}
             className={`flex items-center px-6 py-3 rounded-lg font-medium ${
               currentStep === 1 || isSubmitting
@@ -68,7 +86,7 @@ const SurveyLayout = ({
           </button>
           <button
             type="button"
-            onClick={onNext}
+            onClick={handleNext}
             disabled={isSubmitting}
             className="flex items-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
           >
