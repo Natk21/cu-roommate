@@ -13,17 +13,16 @@ const SurveyQuestion: React.FC<SurveyQuestionProps> = ({
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const handleSelect = (index: number) => {
-    setSelectedIndex(index);
+    setSelectedIndex(selectedIndex === index ? null : index);
   };
 
   return (
-    <div style={{ margin: "20px 0" }}>
-      <div className="w-[1274px] justify-center text-black text-5xl font-semibold leading-[72px]">
-        {question}
-      </div>
-      <div>
+    <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">{question}</h2>
+      <div className="space-y-4">
         {options.map((option, index) => (
           <SurveyOption
+            key={index}
             selected={selectedIndex === index}
             onSelect={() => handleSelect(index)}
             option={option}
