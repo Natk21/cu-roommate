@@ -1,51 +1,45 @@
+import { createContext, useContext, useEffect, useState } from "react";
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
-import {
-  onAuthStateChanged,
   User as FirebaseUser,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
 } from "firebase/auth";
 import { auth } from "../src/firebase/config";
 
-type AuthContextType = {
+interface AuthContextType {
   currentUser: FirebaseUser | null;
   loading: boolean;
-  signOutUser: () => Promise<boolean>;
-};
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  signOutUser: () => Promise<void>;
+}
 
-// Create the context with a default value that matches AuthContextType
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-}
+};
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const signIn = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const signUp = async (email: string, password: string) => {
+    await createUserWithEmailAndPassword(auth, email, password);
+  };
+
   const signOutUser = async () => {
-    try {
-      await firebaseSignOut(auth);
-      // The navigation will be handled in the component where signOutUser is called
-      return true;
-    } catch (error) {
-      console.error("Error signing out:", error);
-      throw error;
-    }
+    await firebaseSignOut(auth);
   };
 
   useEffect(() => {
@@ -54,12 +48,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return unsubscribe;
   }, []);
 
   const value = {
     currentUser,
     loading,
+    signIn,
+    signUp,
     signOutUser,
   };
 
