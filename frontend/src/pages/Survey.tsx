@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { getUserSurvey, submitSurvey } from "../services/surveyService";
+import { getUserBasicInfo } from "../services/userService";
 import SurveyLayout from "../components/survey/SurveyLayout";
 import NonNegotiables from "../components/survey/sections/NonNegotiables";
 import CorePreferences from "../components/survey/sections/CorePreferences";
@@ -62,6 +64,7 @@ export interface SurveyResponse {
 
 const Survey = () => {
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [currentSection, setCurrentSection] = useState(0);
   const [responses, setResponses] = useState<SurveyResponse>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,8 +77,17 @@ const Survey = () => {
   useEffect(() => {
     const checkSurveyStatus = async () => {
       if (currentUser) {
-        setIsLoading(true); // Start loading
+        setIsLoading(true);
         try {
+          // First, check if user has completed basic info
+          const basicInfo = await getUserBasicInfo(currentUser.uid);
+          if (!basicInfo) {
+            // Redirect to basic info survey if not completed
+            navigate("/basic-info");
+            return;
+          }
+
+          // Then check survey status
           const survey = await getUserSurvey(currentUser.uid);
           if (survey) {
             setResponses(survey.responses || {});
@@ -84,15 +96,15 @@ const Survey = () => {
         } catch (error) {
           console.error("Error checking survey status:", error);
         } finally {
-          setIsLoading(false); // Stop loading in all cases
+          setIsLoading(false);
         }
       } else {
-        setIsLoading(false); // Stop loading if no user
+        setIsLoading(false);
       }
     };
 
     checkSurveyStatus();
-  }, [currentUser]);
+  }, [currentUser, navigate]);
 
   const handleResponseUpdate = (updates: Partial<SurveyResponse>) => {
     setResponses((prev) => ({ ...prev, ...updates }));
@@ -126,13 +138,11 @@ const Survey = () => {
     }
   };
 
-  // Update your handleNext function
   const handleNext = async () => {
-    console.log(isUpdating);
     if (currentSection < sections.length - 1) {
       setCurrentSection(currentSection + 1);
     } else {
-      await handleSubmit(); // Pass whether this is an update
+      await handleSubmit();
     }
   };
 
@@ -266,7 +276,6 @@ const Survey = () => {
           </button>
           <button
             onClick={() => {
-              // Navigate to dashboard or home
               window.location.href = "/";
             }}
             className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"

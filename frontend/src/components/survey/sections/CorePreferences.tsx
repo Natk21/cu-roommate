@@ -231,6 +231,22 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
                 </select>
               </div>
             </div>
+            <div>
+                <label
+                  htmlFor="graduationYear"
+                  className="block text-sm font-medium text-gray-700 mb-1 pb-2"
+                >
+                  Major
+                </label>
+                <input
+                  type="text"
+                  id="graduationYear"
+                  value={responses.graduationYear || ""}
+                  onChange={(e) => handleChange("graduationYear")(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm pl-1"
+                  placeholder="e.g., 2025"
+                />
+              </div>
           </div>
 
           <div className="space-y-2">

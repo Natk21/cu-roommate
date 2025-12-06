@@ -30,21 +30,20 @@ const RootLayout = () => {
 
             <div className="hidden md:flex items-center space-x-8">
               <Link
-                to="/survey"
-                className="text-gray-700 hover:text-red-700 transition-colors font-medium"
-              >
-                Survey
-              </Link>
-              <Link
                 to="/matches"
                 className="text-gray-700 hover:text-red-700 transition-colors font-medium"
               >
                 Matches
               </Link>
               {currentUser ? (
-                // Show user email and sign out button when logged in
+                // Show Profile and Sign Out when logged in
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-700">{currentUser.email}</span>
+                  <Link
+                    to="/profile"
+                    className="text-gray-700 hover:text-red-700 transition-colors font-medium"
+                  >
+                    Profile
+                  </Link>
                   <button
                     onClick={async () => {
                       try {

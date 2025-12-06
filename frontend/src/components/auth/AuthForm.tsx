@@ -21,10 +21,11 @@ const AuthForm = ({ isLogin = false }: AuthFormProps) => {
     try {
       if (isLogin) {
         await signIn(email, password);
+        navigate("/"); // Login goes to home
       } else {
         await signUp(email, password);
+        navigate("/basic-info"); // Signup goes to basic info first!
       }
-      navigate("/"); // Redirect after successful auth
     } catch (error: any) {
       setError(error.message);
     } finally {

@@ -11,6 +11,8 @@ import {
   doc,
 } from "firebase/firestore";
 import { SurveyResponse } from "../pages/Survey.tsx";
+import { getAllUsersBasicInfo as getUsersFromUserService } from "./userService";
+
 
 const SURVEYS_COLLECTION = "surveys";
 
@@ -76,6 +78,71 @@ export const getUserSurvey = async (
     return { id: doc.id, ...doc.data() } as SurveyDocument;
   } catch (error) {
     console.error("Error getting survey:", error);
+    throw error;
+  }
+};
+
+// Get all surveys except the current user's
+export const getAllOtherSurveys = async (
+  currentUserId: string
+): Promise<SurveyDocument[]> => {
+  try {
+    // Query all surveys
+    const q = query(collection(db, SURVEYS_COLLECTION));
+    const querySnapshot = await getDocs(q);
+
+    // Filter out current user and map to array
+    const surveys: SurveyDocument[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      // Only add if it's not the current user
+      if (data.userId !== currentUserId) {
+        surveys.push({ id: doc.id, ...data } as SurveyDocument);
+      }
+    });
+
+    return surveys;
+  } catch (error) {
+    console.error("Error getting surveys:", error);
+    throw error;
+  }
+};
+
+// Get all users with completed surveys (for homepage display)
+
+export const getAllUsersBasicInfo = async (): Promise<
+  Array<{
+    userId: string;
+    firstName: string;
+    lastName: string;
+    major: string;
+    graduationYear: number;
+  }>
+> => {
+  try {
+    // Get all users from users collection
+    const users = await getUsersFromUserService();
+    
+    // Get all surveys to match with majors
+    const surveysQuery = query(collection(db, SURVEYS_COLLECTION));
+    const surveysSnapshot = await getDocs(surveysQuery);
+    
+    const surveysMap = new Map();
+    surveysSnapshot.forEach((doc) => {
+      const data = doc.data();
+      surveysMap.set(data.userId, data.responses);
+    });
+
+    // Combine user info with survey data
+    return users.map(user => ({
+      userId: user.userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      major: surveysMap.get(user.userId)?.major || "Undeclared",
+      graduationYear: user.graduationYear,
+    }));
+  } catch (error) {
+    console.error("Error getting users:", error);
     throw error;
   }
 };

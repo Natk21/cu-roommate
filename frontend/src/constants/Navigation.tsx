@@ -1,9 +1,13 @@
-import Weather from "../pages/Weather";
-import Counter from "../pages/Counter";
 import HomePage from "../pages/Home";
 import Survey from "../pages/Survey";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
+import Profile from "../pages/Profile";
+import PublicProfile from "../pages/PublicProfile";
+import BasicInfoSurvey from "../pages/BasicInfoSurvey";
+
+
+
 
 /**
  * TODO: Modify this constant to point to the URL of your backend.
@@ -25,9 +29,19 @@ export const PATHS: {
   element?: JSX.Element;
 }[] = [
   {
-    link: "",
+    link: "home",
     label: "Home",
     element: <HomePage />,
+  },
+  {
+    link: "profile",
+    label: "Profile",
+    element: <Profile />,
+  },
+  {
+    link: "profile/:userId",  // Dynamic route!
+    label: "Public Profile",
+    element: <PublicProfile />,  // Other people's profiles
   },
   {
     link: "survey",
@@ -43,5 +57,10 @@ export const PATHS: {
     link: "signup",
     label: "Signup",
     element: <Signup />,
+  },
+  {
+  link: "basic-info",
+  label: "Basic Info",
+  element: <BasicInfoSurvey />,
   },
 ];
