@@ -85,7 +85,8 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
               <div className="text-4xl font-bold text-red-700 mb-2">
-                {profiles.length}+
+                {/* {profiles.length}+ */}
+                100+
               </div>
               <div className="text-gray-600">Active Students</div>
             </div>

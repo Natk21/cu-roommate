@@ -37,6 +37,7 @@ const RootLayout = () => {
 
             <div className="hidden md:flex items-center space-x-8">
               <Link
+                onClick={() => scrollToTop()}
                 to="/matches"
                 className="text-gray-700 hover:text-red-700 transition-colors font-medium"
               >
