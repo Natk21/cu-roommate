@@ -5,12 +5,12 @@ import SurveyLayout from "../components/survey/SurveyLayout";
 import NonNegotiables from "../components/survey/sections/NonNegotiables";
 import CorePreferences from "../components/survey/sections/CorePreferences";
 import VibeReading from "../components/survey/sections/VibeReading";
-import DormLogistics from "../components/survey/sections/DormLogistics";
 import OptionalPersonality from "../components/survey/sections/OptionalPersonality";
 
 // Define the SurveyResponse interface
 export interface SurveyResponse {
   // Non-negotiables
+  gender?: string;
   genderPreference?: string;
   wakeUpTime?: string;
   bedtime?: string;
@@ -26,13 +26,10 @@ export interface SurveyResponse {
   cleanlinessSelfRating?: number;
   cleaningFrequency?: number;
   cleanlinessMatchImportance?: number;
-  studyLocation?: string;
-  studyLocationImportance?: number;
   personalityType?: string;
   socialFrequency?: string;
   socialHabitsImportance?: number;
   noiseToleranceLevel?: number;
-  messTolerance?: number;
   major?: string;
   college?: string;
   workloadStyle?: string;
@@ -70,6 +67,12 @@ const Survey = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     const checkSurveyStatus = async () => {
@@ -101,6 +104,7 @@ const Survey = () => {
   const handleSubmit = async () => {
     if (!currentUser) {
       setSubmitError("You must be logged in to submit the survey");
+      scrollToTop();
       return false;
     }
 
@@ -117,6 +121,7 @@ const Survey = () => {
       setHasSubmitted(false);
       setSubmitSuccess(false);
       console.error("Error submitting survey:", error);
+      scrollToTop();
       setSubmitError(
         error instanceof Error ? error.message : "Failed to submit survey"
       );
@@ -162,12 +167,6 @@ const Survey = () => {
       title: "Vibe Reading",
       component: (
         <VibeReading responses={responses} onUpdate={handleResponseUpdate} />
-      ),
-    },
-    {
-      title: "Dorm & Logistics",
-      component: (
-        <DormLogistics responses={responses} onUpdate={handleResponseUpdate} />
       ),
     },
     {

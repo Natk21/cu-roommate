@@ -78,11 +78,19 @@ const RootLayout = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-red-700 to-red-900 rounded-lg"></div>
-                <span className="font-bold text-lg">
-                  Cornell Roommate Finder
-                </span>
+              <div className="flex items-center space-x-2">
+                <img
+                  src={"/public/logo.svg"}
+                  alt="CURoommate Logo"
+                  className="w-8 h-8 rounded-lg object-cover"
+                />
+                <Link
+                  to="/"
+                  className="text-xl font-bold bg-red-7
+                  00 bg-clip-text text-transparent"
+                >
+                  CURoommate
+                </Link>
               </div>
               <p className="text-gray-400 text-sm">
                 Connecting Cornell students for better living experiences.

@@ -18,7 +18,7 @@ const OptionalPersonality = ({
     <div className="space-y-8">
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">
-          29. Favorite Cornell Study Spot
+          Favorite Cornell Study Spot
         </h3>
         <p className="text-sm text-gray-500 mb-2">
           (Optional) Where's your go-to place to study on campus?
@@ -34,7 +34,7 @@ const OptionalPersonality = ({
 
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">
-          30. Biggest Pet Peeve in a Roommate
+          Biggest Pet Peeve in a Roommate
         </h3>
         <p className="text-sm text-gray-500 mb-2">
           (Optional) What's one thing a roommate could do that would really
@@ -51,7 +51,7 @@ const OptionalPersonality = ({
 
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">
-          31. Something You Love Doing
+          Something You Love Doing
         </h3>
         <p className="text-sm text-gray-500 mb-2">
           (Optional) Share a hobby or interest you're passionate about
@@ -67,7 +67,7 @@ const OptionalPersonality = ({
 
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">
-          32. What "Red Flags" Are You Trying to Avoid?
+          What "Red Flags" Are You Trying to Avoid?
         </h3>
         <p className="text-sm text-gray-500 mb-2">
           (Optional) Any deal-breakers we should know about?
