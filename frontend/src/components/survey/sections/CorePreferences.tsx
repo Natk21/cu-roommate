@@ -1,5 +1,7 @@
 import SliderQuestion from "../SliderQuestion";
 import { SurveyResponse } from "../../../pages/Survey";
+import { COLLEGES_AND_MAJORS } from "../../../constants/collegesAndMajors";
+import { useEffect, useState } from "react";
 
 interface CorePreferencesProps {
   responses: SurveyResponse;
@@ -10,6 +12,25 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
   const handleChange = (field: keyof SurveyResponse) => (value: any) => {
     onUpdate({ [field]: value });
   };
+
+  // Inside your component, add these state variables
+  const [availableMajors, setAvailableMajors] = useState<string[]>([]);
+
+  // Update available majors when college changes
+  useEffect(() => {
+    if (responses.college) {
+      const selectedCollege = COLLEGES_AND_MAJORS.find(
+        (c) => c.name === responses.college
+      );
+      setAvailableMajors(selectedCollege?.majors || []);
+      // Reset major when college changes
+      if (responses.major && !availableMajors.includes(responses.major)) {
+        handleChange("major")("");
+      }
+    } else {
+      setAvailableMajors([]);
+    }
+  }, [responses.college]);
 
   return (
     <div className="space-y-8">
@@ -186,22 +207,6 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
-                  htmlFor="major"
-                  className="block text-sm font-medium text-gray-700 mb-1 pb-2"
-                >
-                  Major
-                </label>
-                <input
-                  type="text"
-                  id="major"
-                  value={responses.major || ""}
-                  onChange={(e) => handleChange("major")(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm pl-1"
-                  placeholder="e.g., Computer Science"
-                />
-              </div>
-              <div>
-                <label
                   htmlFor="college"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
@@ -210,22 +215,49 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
                 <select
                   id="college"
                   value={responses.college || ""}
-                  onChange={(e) => handleChange("college")(e.target.value)}
+                  onChange={(e) => {
+                    handleChange("college")(e.target.value);
+                    if (responses.major) {
+                      handleChange("major")("");
+                    }
+                  }}
                   className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-red-500 focus:outline-none focus:ring-red-500 sm:text-sm"
+                  required
                 >
-                  <option value="">Select college</option>
-                  {[
-                    "College of Arts & Sciences (CAS)",
-                    "College of Engineering",
-                    "Dyson School",
-                    "College of Agriculture and Life Sciences (CALS)",
-                    "School of Industrial and Labor Relations (ILR)",
-                    "College of Human Ecology",
-                    "College of Architecture, Art, and Planning (AAP)",
-                    "Other",
-                  ].map((college) => (
-                    <option key={college} value={college}>
-                      {college}
+                  <option value="" disabled>
+                    Select college
+                  </option>
+                  {COLLEGES_AND_MAJORS.map((college) => (
+                    <option key={college.code} value={college.name}>
+                      {college.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="major"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Major
+                </label>
+                <select
+                  id="major"
+                  value={responses.major || ""}
+                  onChange={(e) => handleChange("major")(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-red-500 focus:outline-none focus:ring-red-500 sm:text-sm"
+                  disabled={!responses.college}
+                  required={!!responses.college}
+                >
+                  <option value="" disabled>
+                    {responses.college
+                      ? "Select major"
+                      : "Select a college first"}
+                  </option>
+                  {availableMajors.map((major) => (
+                    <option key={major} value={major}>
+                      {major}
                     </option>
                   ))}
                 </select>

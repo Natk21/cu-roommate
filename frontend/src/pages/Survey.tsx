@@ -70,6 +70,12 @@ const Survey = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     const checkSurveyStatus = async () => {
@@ -101,6 +107,7 @@ const Survey = () => {
   const handleSubmit = async () => {
     if (!currentUser) {
       setSubmitError("You must be logged in to submit the survey");
+      scrollToTop();
       return false;
     }
 
@@ -117,6 +124,7 @@ const Survey = () => {
       setHasSubmitted(false);
       setSubmitSuccess(false);
       console.error("Error submitting survey:", error);
+      scrollToTop();
       setSubmitError(
         error instanceof Error ? error.message : "Failed to submit survey"
       );
