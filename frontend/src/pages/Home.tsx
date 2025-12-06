@@ -1,5 +1,7 @@
 import { Shield, Heart, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import ProfileCard from "../components/ProfileCard";
 import { getAllUsersBasicInfo } from "../services/surveyService";
 import "./index.css";
@@ -14,6 +16,8 @@ interface UserProfile {
 }
 
 const HomePage = () => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,13 +59,16 @@ const HomePage = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => (window.location.href = "/signup")}
+                onClick={() => {
+                  if (currentUser) {
+                    navigate("/matches");
+                  } else {
+                    navigate("/signup");
+                  }
+                }}
                 className="bg-gradient-to-r from-red-700 to-red-800 text-white px-8 py-4 rounded-xl hover:from-red-800 hover:to-red-900 transition-all shadow-lg hover:shadow-xl font-semibold text-lg"
               >
-                Start Matching
-              </button>
-              <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl hover:border-red-700 hover:text-red-700 transition-all font-semibold text-lg bg-white">
-                Learn More
+                {currentUser ? "View Matches" : "Start Matching"}
               </button>
             </div>
           </div>
