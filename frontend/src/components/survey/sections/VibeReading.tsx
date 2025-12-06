@@ -32,7 +32,7 @@ const VibeReading = ({ responses, onUpdate }: VibeReadingProps) => {
         <div className="space-y-6">
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
-              20. Ideal Room Atmosphere
+              Ideal Room Atmosphere
             </h3>
             <p className="text-sm text-gray-500 mb-3">Select all that apply</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -66,7 +66,7 @@ const VibeReading = ({ responses, onUpdate }: VibeReadingProps) => {
 
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
-              21. Music in the Room
+              Music in the Room
             </h3>
             <div className="space-y-3">
               {[
@@ -103,7 +103,7 @@ const VibeReading = ({ responses, onUpdate }: VibeReadingProps) => {
 
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
-              22. Ideal Friday Night
+              Ideal Friday Night
             </h3>
             <p className="text-sm text-gray-500 mb-3">
               Select your typical Friday night preference
@@ -140,7 +140,7 @@ const VibeReading = ({ responses, onUpdate }: VibeReadingProps) => {
 
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
-              23. Communication Style
+              Communication Style
             </h3>
             <SliderQuestion
               question="How do you prefer to communicate with your roommate?"
@@ -165,7 +165,7 @@ const VibeReading = ({ responses, onUpdate }: VibeReadingProps) => {
 
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
-              24. Openness to Sharing Items
+              Openness to Sharing Items
             </h3>
             <div className="space-y-3">
               {[

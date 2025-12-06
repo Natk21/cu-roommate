@@ -48,7 +48,7 @@ const DormLogistics = ({
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h3 className="text-lg font-medium text-gray-900">25. Desired Dorms</h3>
+        <h3 className="text-lg font-medium text-gray-900">Desired Dorms</h3>
         <p className="text-sm text-gray-500 mb-3">Select all that apply</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {dorms.map((dorm) => (
@@ -70,7 +70,7 @@ const DormLogistics = ({
 
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">
-          26. Room Type Preference
+          Room Type Preference
         </h3>
         <div className="space-y-3 mt-3">
           {roomTypes.map((type) => (
@@ -92,9 +92,7 @@ const DormLogistics = ({
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-lg font-medium text-gray-900">
-          27. AC Requirement
-        </h3>
+        <h3 className="text-lg font-medium text-gray-900">AC Requirement</h3>
         <div className="space-y-3 mt-3">
           {["Must have A/C", "Prefer A/C", "Don’t care"].map((option) => (
             <label
@@ -116,7 +114,7 @@ const DormLogistics = ({
 
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">
-          28. Move-in Time Flexibility
+          Move-in Time Flexibility
         </h3>
         <div className="space-y-3 mt-3">
           {["Early", "Normal", "Late", "Flexible"].map((option) => (

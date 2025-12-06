@@ -22,9 +22,9 @@ const NonNegotiables = ({ responses, onUpdate }: NonNegotiablesProps) => {
             >
               <input
                 type="radio"
-                name="genderPreference"
-                checked={responses.genderPreference === option}
-                onChange={() => handleChange("genderPreference")(option)}
+                name="gender"
+                checked={responses.gender === option}
+                onChange={() => handleChange("gender")(option)}
                 className="h-5 w-5 text-red-600 focus:ring-red-500 border-gray-300"
               />
               <span className="text-gray-700">{option}</span>
@@ -56,7 +56,7 @@ const NonNegotiables = ({ responses, onUpdate }: NonNegotiablesProps) => {
 
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">
-          2. Wake-Up Time Range
+          Wake-Up Time Range
         </h3>
         <p className="text-sm text-gray-500">
           What's the latest your roommate can wake up without it being a
@@ -116,7 +116,7 @@ const NonNegotiables = ({ responses, onUpdate }: NonNegotiablesProps) => {
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-lg font-medium text-gray-900">4. Noise in Room</h3>
+        <h3 className="text-lg font-medium text-gray-900">Noise in Room</h3>
         <p className="text-sm text-gray-500">I cannot live with someone who:</p>
         <div className="space-y-3 mt-3">
           {[
@@ -145,7 +145,7 @@ const NonNegotiables = ({ responses, onUpdate }: NonNegotiablesProps) => {
 
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">
-          5. Cleanliness Minimum Requirement
+          Cleanliness Minimum Requirement
         </h3>
         <p className="text-sm text-gray-500">My roommate must at least be:</p>
         <div className="space-y-3 mt-3">

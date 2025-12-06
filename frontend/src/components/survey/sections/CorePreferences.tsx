@@ -41,7 +41,7 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
 
         <div className="space-y-6">
           <SliderQuestion
-            question="10. How close do you want your sleep schedule to match your roommate's?"
+            question="How close do you want your sleep schedule to match your roommate's?"
             minLabel="Don't care"
             maxLabel="Very important"
             value={responses.sleepScheduleImportance || 3}
@@ -50,7 +50,7 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
 
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
-              11. Cleanliness Preferences
+              Cleanliness Preferences
             </h3>
             <SliderQuestion
               question="How tidy do you keep your space?"
@@ -79,9 +79,7 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-lg font-medium text-gray-900">
-              12. Study Habits
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900">Study Habits</h3>
             <p className="text-sm text-gray-500 mb-3">
               Where do you usually study?
             </p>
@@ -118,7 +116,7 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
 
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
-              13. Introvert / Extrovert Scale
+              Introvert / Extrovert Scale
             </h3>
             <div className="space-y-3 pl-4">
               {[
@@ -144,7 +142,7 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
 
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
-              14. Social Lifestyle
+              Social Lifestyle
             </h3>
             <p className="text-sm text-gray-500 mb-3">
               How often do you go out?
@@ -177,14 +175,14 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
 
           <div className="space-y-2">
             <SliderQuestion
-              question="15. Noise Tolerance"
+              question="Noise Tolerance"
               minLabel="Needs quiet"
               maxLabel="Very tolerant"
               value={responses.noiseToleranceLevel || 3}
               onChange={handleChange("noiseToleranceLevel")}
             />
             <SliderQuestion
-              question="16. Mess Tolerance"
+              question="Mess Tolerance"
               minLabel="Needs very clean"
               maxLabel="Doesn't mind clutter"
               value={responses.messTolerance || 3}
@@ -202,7 +200,7 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
         <div className="space-y-6">
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
-              17. Major / College
+              Major / College
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -267,7 +265,7 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
 
           <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
-              18. Workload Style
+              Workload Style
             </h3>
             <div className="space-y-3 pl-4">
               {["Academic grind", "Balanced", "Light/stress-free"].map(
@@ -296,9 +294,7 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-lg font-medium text-gray-900">
-              19. Daily Routine
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900">Daily Routine</h3>
             <p className="text-sm text-gray-500 mb-3">Are you a:</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pl-4">
               {[

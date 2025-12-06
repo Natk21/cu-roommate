@@ -43,11 +43,45 @@ const calculateMatchScore = (
   let maxPossibleScore = 0;
 
   // Gender: non-negotiable
-  if (userA.genderPreference && userB.genderPreference) {
-    const genderScore =
-      userA.genderPreference === userB.genderPreference ? 1 : 0;
-    totalScore += genderScore * 10; // Weight for this category
-    maxPossibleScore += 10;
+  let genderCompatible = false;
+  if (
+    userA.genderPreference &&
+    userB.genderPreference &&
+    userA.gender &&
+    userB.gender
+  ) {
+    // Convert to lowercase for case-insensitive comparison
+    const genderA = userA.gender.toLowerCase();
+    const genderB = userB.gender.toLowerCase();
+    const prefA = userA.genderPreference.toLowerCase();
+    const prefB = userB.genderPreference.toLowerCase();
+
+    // If either preference is "any gender", always compatible
+    if (prefA === "any gender" || prefB === "any gender") {
+      genderCompatible = true;
+    }
+    // If preference is "my gender", check if genders match
+    else if (
+      prefA === "my gender" &&
+      prefB === "my gender" &&
+      genderA === genderB
+    ) {
+      genderCompatible = true;
+    }
+    // If one preference is "my gender", check if it matches the other's gender
+    else if (prefA === "my gender" && genderA === genderB) {
+      genderCompatible = true;
+    } else if (prefB === "my gender" && genderA === genderB) {
+      genderCompatible = true;
+    }
+    // Exact match of preferences
+    else if (prefA === genderB && prefB === genderA) {
+      genderCompatible = true;
+    }
+
+    if (!genderCompatible) {
+      return 0;
+    }
   }
 
   // Example: Compare sleep schedules
