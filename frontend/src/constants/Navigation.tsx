@@ -6,9 +6,6 @@ import Profile from "../pages/Profile";
 import PublicProfile from "../pages/PublicProfile";
 import BasicInfoSurvey from "../pages/BasicInfoSurvey";
 
-
-
-
 /**
  * TODO: Modify this constant to point to the URL of your backend.
  * It should be of the format "https://<app-name>.fly.dev/api"
@@ -29,7 +26,7 @@ export const PATHS: {
   element?: JSX.Element;
 }[] = [
   {
-    link: "",
+    link: "/",
     label: "Home",
     element: <HomePage />,
   },
@@ -39,9 +36,9 @@ export const PATHS: {
     element: <Profile />,
   },
   {
-    link: "profile/:userId",  // Dynamic route!
+    link: "profile/:userId", // Dynamic route!
     label: "Public Profile",
-    element: <PublicProfile />,  // Other people's profiles
+    element: <PublicProfile />, // Other people's profiles
   },
   {
     link: "survey",
@@ -59,8 +56,8 @@ export const PATHS: {
     element: <Signup />,
   },
   {
-  link: "basic-info",
-  label: "Basic Info",
-  element: <BasicInfoSurvey />,
+    link: "basic-info",
+    label: "Basic Info",
+    element: <BasicInfoSurvey />,
   },
 ];
