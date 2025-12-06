@@ -166,8 +166,8 @@ const Profile = () => {
                         : getFirstName()}
                     </h1>
                     <div className="flex items-center gap-2 text-white/90">
-                      <span>{profile.major || "Undeclared"}</span>
-                      <span>•</span>
+                      {/* <span>{profile.major || "Undeclared"}</span>
+                      <span>•</span> */}
                       <span>
                         Class of {basicInfo?.graduationYear || "20XX"}
                       </span>
