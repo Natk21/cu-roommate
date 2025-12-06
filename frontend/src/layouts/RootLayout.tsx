@@ -4,6 +4,12 @@ import { useAuth } from "../../contexts/AuthContext";
 
 const RootLayout = () => {
   const { currentUser, loading, signOutUser } = useAuth();
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   if (loading) {
     return <div>Loading...</div>; // Or a proper loading spinner
@@ -21,6 +27,7 @@ const RootLayout = () => {
                 className="w-8 h-8 rounded-lg object-cover"
               />
               <Link
+                onClick={() => scrollToTop()}
                 to="/"
                 className="text-xl font-bold bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
               >

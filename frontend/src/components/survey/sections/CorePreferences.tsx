@@ -7,13 +7,7 @@ interface CorePreferencesProps {
   responses: SurveyResponse;
   onUpdate: (updates: Partial<SurveyResponse>) => void;
 }
-const roomTypes = [
-  "Single",
-  "Double",
-  "Suite",
-  "Traditional Hall",
-  "No preference",
-];
+const roomTypes = ["Single", "Double", "Triple", "Quad", "No preference"];
 const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
   const handleChange = (field: keyof SurveyResponse) => (value: any) => {
     onUpdate({ [field]: value });
