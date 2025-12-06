@@ -5,6 +5,7 @@ import Signup from "../pages/Signup";
 import Profile from "../pages/Profile";
 import PublicProfile from "../pages/PublicProfile";
 import BasicInfoSurvey from "../pages/BasicInfoSurvey";
+import Matches from "../pages/Matches";
 
 /**
  * TODO: Modify this constant to point to the URL of your backend.
@@ -59,5 +60,10 @@ export const PATHS: {
     link: "basic-info",
     label: "Basic Info",
     element: <BasicInfoSurvey />,
+  },
+  {
+    link: "matches",
+    label: "Matches",
+    element: <Matches />,
   },
 ];
