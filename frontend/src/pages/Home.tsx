@@ -115,17 +115,20 @@ const HomePage = () => {
             </div>
           ) : profiles.length > 0 ? (
             <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
-              {profiles.map((profile) => (
-                <div key={profile.userId} className="flex-shrink-0 w-80">
-                  <ProfileCard
-                    name={`${profile.firstName} ${profile.lastName}`}
-                    major={profile.major}
-                    graduationYear={profile.graduationYear}
-                    userId={profile.userId}
-                    photoURL={profile.profilePhotoURL}
-                  />
-                </div>
-              ))}
+              {profiles
+                .sort(() => 0.5 - Math.random()) // Shuffle the array
+                .slice(0, 7) // Take first 7
+                .map((profile) => (
+                  <div key={profile.userId} className="flex-shrink-0 w-80">
+                    <ProfileCard
+                      name={`${profile.firstName} ${profile.lastName}`}
+                      major={profile.major}
+                      graduationYear={profile.graduationYear}
+                      userId={profile.userId}
+                      photoURL={profile.profilePhotoURL}
+                    />
+                  </div>
+                ))}
             </div>
           ) : (
             <div className="text-center py-12">
