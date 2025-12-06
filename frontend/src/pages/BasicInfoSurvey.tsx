@@ -365,7 +365,7 @@ const BasicInfoSurvey = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                placeholder="Max"
+                placeholder="First Name"
               />
             </div>
 
@@ -384,7 +384,7 @@ const BasicInfoSurvey = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                placeholder="Shi"
+                placeholder="Last Name"
               />
             </div>
           </div>
