@@ -275,7 +275,7 @@ const HomePage = () => {
             situation through our platform.
           </p>
           <button
-            onClick={() => (window.location.href = "/survey")}
+            onClick={() => (window.location.href = "/basic-info")}
             className="bg-white text-red-700 px-10 py-4 rounded-xl hover:bg-gray-50 transition-all text-lg font-bold shadow-xl hover:shadow-2xl hover:scale-105"
           >
             Get Started Today
