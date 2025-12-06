@@ -1,5 +1,3 @@
-//survey capturing basic user information
-
 // src/pages/BasicInfoSurvey.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +10,9 @@ export interface BasicUserInfo {
   graduationYear: number;
   bio: string;
   profilePhotoURL?: string;
+  email?: string;
+  phone?: string;
+  instagram?: string;
 }
 
 const BasicInfoSurvey = () => {
@@ -24,6 +25,9 @@ const BasicInfoSurvey = () => {
     graduationYear: 2029,
     bio: "",
     profilePhotoURL: "",
+    email: "",
+    phone: "",
+    instagram: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,10 +68,61 @@ const BasicInfoSurvey = () => {
     }));
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Resize to max 300x300 while maintaining aspect ratio
+          let width = img.width;
+          let height = img.height;
+          const maxSize = 300;
+          
+          if (width > height) {
+            if (width > maxSize) {
+              height *= maxSize / width;
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width *= maxSize / height;
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Convert to base64 with heavy compression
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+          
+          console.log("Original size:", file.size, "bytes");
+          console.log("Compressed size:", compressedBase64.length, "characters");
+          
+          // Check if still too large (aiming for under 200KB in base64)
+          if (compressedBase64.length > 200000) {
+            reject(new Error("Image is still too large after compression. Please use a smaller image."));
+          } else {
+            resolve(compressedBase64);
+          }
+        };
+        img.onerror = () => reject(new Error("Failed to load image"));
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Check file size (max 5MB)
+      // Check file size (max 5MB original)
       if (file.size > 5 * 1024 * 1024) {
         setError("Photo must be less than 5MB");
         return;
@@ -79,17 +134,22 @@ const BasicInfoSurvey = () => {
         return;
       }
 
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result as string);
+      try {
+        setError(null);
+        const compressedBase64 = await compressImage(file);
+        
+        setPhotoPreview(compressedBase64);
         setFormData((prev) => ({
           ...prev,
-          profilePhotoURL: reader.result as string,
+          profilePhotoURL: compressedBase64,
         }));
-      };
-      reader.readAsDataURL(file);
-      setError(null);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Failed to process image");
+        }
+      }
     }
   };
 
@@ -126,12 +186,23 @@ const BasicInfoSurvey = () => {
     setError(null);
 
     try {
-      await submitBasicInfo(currentUser.uid, formData);
+      console.log("Attempting to submit with user:", currentUser.uid);
+      console.log("Form data:", formData);
+      
+      const result = await submitBasicInfo(currentUser.uid, formData);
+      console.log("Submit result:", result);
+      
       // Redirect to main survey
       navigate("/survey");
     } catch (error) {
       console.error("Error submitting basic info:", error);
-      setError("Failed to submit. Please try again.");
+      
+      // Show detailed error message
+      if (error instanceof Error) {
+        setError(`Failed to submit: ${error.message}`);
+      } else {
+        setError("Failed to submit. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -202,7 +273,7 @@ const BasicInfoSurvey = () => {
               Profile Photo (Optional)
             </label>
             <p className="text-sm text-gray-600 mb-4">
-              Add a photo to help others recognize you
+              Add a photo to help others recognize you. Images will be automatically compressed.
             </p>
             
             <div className="flex flex-col items-center">
@@ -218,16 +289,31 @@ const BasicInfoSurvey = () => {
                 )}
               </div>
               
-              <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg transition-colors">
-                <span>Choose Photo</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-              </label>
-              <p className="text-xs text-gray-500 mt-2">Max size: 5MB</p>
+              <div className="flex gap-2">
+                <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg transition-colors">
+                  <span>{photoPreview ? 'Change Photo' : 'Choose Photo'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                </label>
+                
+                {photoPreview && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPhotoPreview(null);
+                      setFormData(prev => ({ ...prev, profilePhotoURL: "" }));
+                    }}
+                    className="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Will be resized to 300x300 and compressed</p>
             </div>
           </div>
 
@@ -300,7 +386,7 @@ const BasicInfoSurvey = () => {
           </div>
 
           {/* Bio */}
-          <div className="mb-8">
+          <div className="mb-6">
             <label
               htmlFor="bio"
               className="block text-lg font-semibold text-gray-900 mb-2"
@@ -326,6 +412,78 @@ const BasicInfoSurvey = () => {
               <p className={`text-sm ${formData.bio.length >= 50 ? 'text-green-600' : 'text-gray-500'}`}>
                 {formData.bio.length} / 50
               </p>
+            </div>
+          </div>
+
+          {/* Contact Information Section */}
+          <div className="mb-6 border-t pt-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Contact Information</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              How can potential roommates reach you? (All optional)
+            </p>
+
+            <div className="space-y-4">
+              {/* Email */}
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-md font-medium text-gray-900 mb-2"
+                >
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                  placeholder="your.email@cornell.edu"
+                />
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label
+                  htmlFor="phone"
+                  className="block text-md font-medium text-gray-900 mb-2"
+                >
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                  placeholder="(123) 456-7890"
+                />
+              </div>
+
+              {/* Instagram */}
+              <div>
+                <label
+                  htmlFor="instagram"
+                  className="block text-md font-medium text-gray-900 mb-2"
+                >
+                  Instagram Username
+                </label>
+                <div className="flex">
+                  <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                    @
+                  </span>
+                  <input
+                    type="text"
+                    id="instagram"
+                    name="instagram"
+                    value={formData.instagram}
+                    onChange={handleChange}
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                    placeholder="username"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

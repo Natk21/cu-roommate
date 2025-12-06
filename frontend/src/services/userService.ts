@@ -23,6 +23,9 @@ export interface UserDocument {
   graduationYear: number;
   bio: string;
   profilePhotoURL?: string;
+  email?: string;
+  phone?: string;
+  instagram?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -33,35 +36,54 @@ export const submitBasicInfo = async (
   basicInfo: BasicUserInfo
 ): Promise<{ id: string; success: boolean }> => {
   try {
+    console.log("Starting submitBasicInfo with userId:", userId);
+    console.log("Basic info data:", basicInfo);
+
     // Check if user already has basic info
     const querySnapshot = await getDocs(
       query(collection(db, USERS_COLLECTION), where("userId", "==", userId))
     );
 
+    console.log("Query completed. Empty?", querySnapshot.empty);
+
     const userData = {
       userId,
-      ...basicInfo,
+      firstName: basicInfo.firstName,
+      lastName: basicInfo.lastName,
+      graduationYear: basicInfo.graduationYear,
+      bio: basicInfo.bio,
+      profilePhotoURL: basicInfo.profilePhotoURL || "",
       updatedAt: new Date().toISOString(),
     };
+
+    console.log("Prepared user data:", userData);
 
     let docRef: DocumentReference<DocumentData>;
     
     if (!querySnapshot.empty) {
       // Update existing document
+      console.log("Updating existing document");
       const docId = querySnapshot.docs[0].id;
       await updateDoc(doc(db, USERS_COLLECTION, docId), userData);
       docRef = doc(db, USERS_COLLECTION, docId);
+      console.log("Update successful");
     } else {
       // Create new document
+      console.log("Creating new document");
       docRef = await addDoc(collection(db, USERS_COLLECTION), {
         ...userData,
         createdAt: new Date().toISOString(),
       });
+      console.log("Creation successful, doc ID:", docRef.id);
     }
 
     return { id: docRef.id, success: true };
   } catch (error) {
-    console.error("Error in submitBasicInfo:", error);
+    console.error("FULL Error in submitBasicInfo:", error);
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
     throw error;
   }
 };

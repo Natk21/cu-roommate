@@ -290,6 +290,45 @@ const Profile = () => {
           </div>
         </div>
 
+        {/* Contact Button */}
+        <div className="mt-8 bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Contact Information</h2>
+          <div className="space-y-4">
+            {basicInfo?.email && (
+              <div className="flex items-center gap-3">
+                <span className="font-semibold text-gray-900 w-32">Email:</span>
+                <a href={`mailto:${basicInfo.email}`} className="text-red-600 hover:text-red-700 hover:underline">
+                  {basicInfo.email}
+                </a>
+              </div>
+            )}
+            {basicInfo?.phone && (
+              <div className="flex items-center gap-3">
+                <span className="font-semibold text-gray-900 w-32">Phone:</span>
+                <a href={`tel:${basicInfo.phone}`} className="text-red-600 hover:text-red-700 hover:underline">
+                  {basicInfo.phone}
+                </a>
+              </div>
+            )}
+            {basicInfo?.instagram && (
+              <div className="flex items-center gap-3">
+                <span className="font-semibold text-gray-900 w-32">Instagram:</span>
+                <a 
+                  href={`https://instagram.com/${basicInfo.instagram}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-red-600 hover:text-red-700 hover:underline"
+                >
+                  @{basicInfo.instagram}
+                </a>
+              </div>
+            )}
+            {(!basicInfo?.email && !basicInfo?.phone && !basicInfo?.instagram) && (
+              <p className="text-gray-500 text-center">No contact information provided</p>
+            )}
+          </div>
+        </div>
+
         {/* Edit Profile Button */}
         <div className="mt-8 text-center">
           <button 

@@ -1,6 +1,8 @@
+// src/firebase/config.ts - REVERT TO THIS
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+// NO STORAGE IMPORT
 
 const firebaseConfig = {
   apiKey: "AIzaSyCC6KojCnC6siphX2agJsXsI1_JnLDwmDU",
@@ -19,5 +21,7 @@ export const db = getFirestore(app);
 
 // Initialize Auth
 export const auth = getAuth(app);
+
+// NO STORAGE EXPORT
 
 export default app;

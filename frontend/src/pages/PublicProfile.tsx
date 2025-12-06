@@ -30,10 +30,12 @@ const PublicProfile = () => {
       try {
         // Load basic info (name, photo, bio)
         const userBasicInfo = await getUserBasicInfo(userId);
+        console.log("Loaded basic info:", userBasicInfo);
         setBasicInfo(userBasicInfo);
 
         // Load survey data
         const survey = await getUserSurvey(userId);
+        console.log("Loaded survey:", survey);
         if (survey) {
           setProfile({ ...survey.responses, userId: survey.userId });
         }
@@ -100,11 +102,11 @@ const PublicProfile = () => {
       <div className="max-w-6xl mx-auto">
         {/* Back Button */}
         <button
-          onClick={() => (window.location.href = "/Home")}
+          onClick={() => navigate('/')}
           className="mb-6 flex items-center text-gray-600 hover:text-red-600 transition-colors"
         >
           <ChevronLeft className="w-5 h-5 mr-1" />
-          Back
+          Back to Home
         </button>
 
         {/* Header Section */}
@@ -295,12 +297,42 @@ const PublicProfile = () => {
         )}
 
         {/* Contact Button */}
-        <div className="mt-8 text-center">
-          <button 
-            className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-semibold text-lg transition-colors shadow-lg"
-          >
-            Send Message
-          </button>
+        <div className="mt-8 bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Contact Information</h2>
+          <div className="space-y-4">
+            {basicInfo?.email && (
+              <div className="flex items-center gap-3">
+                <span className="font-semibold text-gray-900 w-32">Email:</span>
+                <a href={`mailto:${basicInfo.email}`} className="text-red-600 hover:text-red-700 hover:underline">
+                  {basicInfo.email}
+                </a>
+              </div>
+            )}
+            {basicInfo?.phone && (
+              <div className="flex items-center gap-3">
+                <span className="font-semibold text-gray-900 w-32">Phone:</span>
+                <a href={`tel:${basicInfo.phone}`} className="text-red-600 hover:text-red-700 hover:underline">
+                  {basicInfo.phone}
+                </a>
+              </div>
+            )}
+            {basicInfo?.instagram && (
+              <div className="flex items-center gap-3">
+                <span className="font-semibold text-gray-900 w-32">Instagram:</span>
+                <a 
+                  href={`https://instagram.com/${basicInfo.instagram}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-red-600 hover:text-red-700 hover:underline"
+                >
+                  @{basicInfo.instagram}
+                </a>
+              </div>
+            )}
+            {(!basicInfo?.email && !basicInfo?.phone && !basicInfo?.instagram) && (
+              <p className="text-gray-500 text-center">No contact information provided</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

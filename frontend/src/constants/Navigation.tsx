@@ -29,7 +29,7 @@ export const PATHS: {
   element?: JSX.Element;
 }[] = [
   {
-    link: "home",
+    link: "",
     label: "Home",
     element: <HomePage />,
   },

@@ -222,12 +222,10 @@ const Survey = () => {
             Edit Again
           </button>
           <button
-            onClick={() => {
-              window.location.href = "/";
-            }}
+            onClick={() => navigate("/")}
             className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
           >
-            Back to Dashboard
+            Back to Home
           </button>
         </div>
       </div>
@@ -242,17 +240,25 @@ const Survey = () => {
         <p className="mb-6 text-gray-600">
           Thank you for completing the survey. Your responses have been saved.
         </p>
-        <button
-          onClick={() => {
-            setHasSubmitted(false);
-            setIsUpdating(true);
-            setSubmitSuccess(false);
-            setCurrentSection(0);
-          }}
-          className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-        >
-          Edit My Responses
-        </button>
+        <div className="space-x-4">
+          <button
+            onClick={() => {
+              setHasSubmitted(false);
+              setIsUpdating(true);
+              setSubmitSuccess(false);
+              setCurrentSection(0);
+            }}
+            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Edit My Responses
+          </button>
+          <button
+            onClick={() => navigate("/")}
+            className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+          >
+            Back to Home
+          </button>
+        </div>
       </div>
     );
   } else if (hasSubmitted) {
@@ -275,12 +281,10 @@ const Survey = () => {
             Edit My Responses
           </button>
           <button
-            onClick={() => {
-              window.location.href = "/";
-            }}
+            onClick={() => navigate("/")}
             className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
           >
-            Back to Dashboard
+            Back to Home
           </button>
         </div>
       </div>

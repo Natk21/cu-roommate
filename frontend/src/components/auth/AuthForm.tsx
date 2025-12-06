@@ -21,7 +21,7 @@ const AuthForm = ({ isLogin = false }: AuthFormProps) => {
     try {
       if (isLogin) {
         await signIn(email, password);
-        navigate("/"); // Login goes to home
+        navigate(""); // Login goes to home
       } else {
         await signUp(email, password);
         navigate("/basic-info"); // Signup goes to basic info first!

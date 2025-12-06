@@ -109,7 +109,6 @@ export const getAllOtherSurveys = async (
 };
 
 // Get all users with completed surveys (for homepage display)
-
 export const getAllUsersBasicInfo = async (): Promise<
   Array<{
     userId: string;
@@ -117,6 +116,7 @@ export const getAllUsersBasicInfo = async (): Promise<
     lastName: string;
     major: string;
     graduationYear: number;
+    profilePhotoURL?: string; // ADD THIS
   }>
 > => {
   try {
@@ -140,6 +140,7 @@ export const getAllUsersBasicInfo = async (): Promise<
       lastName: user.lastName,
       major: surveysMap.get(user.userId)?.major || "Undeclared",
       graduationYear: user.graduationYear,
+      profilePhotoURL: user.profilePhotoURL, // ADD THIS LINE
     }));
   } catch (error) {
     console.error("Error getting users:", error);
