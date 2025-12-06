@@ -1,53 +1,61 @@
-// src/pages/PublicProfile.tsx
-// This shows OTHER users' profiles (not your own)
-
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { getUserSurvey } from '../services/surveyService';
-import { getUserBasicInfo, UserDocument } from '../services/userService';
-import { SurveyResponse } from './Survey';
-
+// src/pages/Profile.tsx
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
+import { getUserSurvey } from "../services/surveyService";
+import { getUserBasicInfo } from "../services/userService";
+import { SurveyResponse } from "./Survey";
+import { useNavigate, useParams } from "react-router-dom";
 interface ProfileData extends SurveyResponse {
-  userId?: string;
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
+  profilePhotoURL?: string;
+  graduationYear?: number;
+  tags?: string[];
 }
 
-const PublicProfile = () => {
-  const { userId } = useParams<{ userId: string }>();
-  const navigate = useNavigate();
+const Profile = () => {
+  const { currentUser } = useAuth();
+  const { userId } = useParams();
   const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [basicInfo, setBasicInfo] = useState<UserDocument | null>(null);
+  const [basicInfo, setBasicInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!userId) {
+      if (!currentUser) {
         setLoading(false);
         return;
       }
 
       try {
-        // Load basic info (name, photo, bio)
-        const userBasicInfo = await getUserBasicInfo(userId);
-        console.log("Loaded basic info:", userBasicInfo);
+        // Load both basic info and survey data in parallel
+        const [userBasicInfo, survey] = await Promise.all([
+          getUserBasicInfo(userId || ""),
+          getUserSurvey(userId || ""),
+        ]);
+
+        // Set basic info separately if needed
         setBasicInfo(userBasicInfo);
 
-        // Load survey data
-        const survey = await getUserSurvey(userId);
-        console.log("Loaded survey:", survey);
-        if (survey) {
-          setProfile({ ...survey.responses, userId: survey.userId });
-        }
+        // Merge both data sources into profile state
+        setProfile((prev) => ({
+          ...prev, // Keep any existing profile data
+          ...userBasicInfo, // Add/overwrite with basic info
+          ...(survey?.responses || {}), // Add survey responses if they exist
+        }));
       } catch (error) {
-        console.error('Error loading profile:', error);
+        console.error("Error loading profile:", error);
       } finally {
         setLoading(false);
       }
     };
 
     loadProfile();
-  }, [userId]);
+  }, [currentUser]);
 
   if (loading) {
     return (
@@ -57,16 +65,36 @@ const PublicProfile = () => {
     );
   }
 
-  if (!profile && !basicInfo) {
+  if (!currentUser) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">Profile not found</p>
+          <p className="text-gray-600 mb-4">
+            Please log in to view your profile
+          </p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => (window.location.href = "/login")}
             className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors"
           >
-            Go Home
+            Log In
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">
+            No profile data found. Please complete the survey first.
+          </p>
+          <button
+            onClick={() => (window.location.href = "/survey")}
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors"
+          >
+            Complete Survey
           </button>
         </div>
       </div>
@@ -75,263 +103,447 @@ const PublicProfile = () => {
 
   // Generate tags based on survey responses
   const generateTags = () => {
-    if (!profile) return [];
-    
     const tags: string[] = [];
-    if (profile.hobbies?.toLowerCase().includes('music')) tags.push('Musician');
-    if (profile.hobbies?.toLowerCase().includes('gym') || profile.hobbies?.toLowerCase().includes('fitness')) tags.push('Gym');
-    if (profile.noiseTolerance === 'Needs quiet' || profile.bedtime === 'Before 11 PM') tags.push('Wants Room Quiet');
-    if (profile.socialFrequency === 'Rarely') tags.push('Introvert');
-    if (profile.socialFrequency === '3+ nights a week') tags.push('Social');
-    return tags.slice(0, 3);
+    if (profile.hobbies?.toLowerCase().includes("music")) tags.push("Musician");
+    if (
+      profile.hobbies?.toLowerCase().includes("gym") ||
+      profile.hobbies?.toLowerCase().includes("fitness")
+    )
+      tags.push("Gym");
+    if (
+      profile.noiseTolerance === "Needs quiet" ||
+      profile.bedtime === "Before 11 PM"
+    )
+      tags.push("Wants Room Quiet");
+    if (profile.socialFrequency === "Rarely") tags.push("Introvert");
+    if (profile.socialFrequency === "3+ nights a week") tags.push("Social");
+    return tags.slice(0, 3); // Limit to 3 tags
   };
 
   const tags = generateTags();
-  const images = [basicInfo?.profilePhotoURL || '/api/placeholder/400/400'];
+  const images = ["/api/placeholder/400/400"]; // Add actual image URLs from storage
 
-  // Extract name from basicInfo or use default
-  const getDisplayName = () => {
-    if (basicInfo) {
-      return `${basicInfo.firstName} ${basicInfo.lastName}`;
-    }
-    return 'Cornell Student';
+  // Helper function to get user's first name from email
+  const getFirstName = () => {
+    return currentUser.email?.split("@")[0] || "User";
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate('/')}
-          className="mb-6 flex items-center text-gray-600 hover:text-red-600 transition-colors"
-        >
-          <ChevronLeft className="w-5 h-5 mr-1" />
-          Back to Home
-        </button>
-
-        {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-          <div className="flex flex-col md:flex-row gap-8 items-start">
-            {/* Image Carousel */}
-            <div className="flex-shrink-0">
-              <div className="relative">
-                <div className="w-64 h-64 bg-gray-200 rounded-2xl flex items-center justify-center overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Header Section with Gradient Background */}
+        <div className="bg-gradient-to-r from-red-600 to-red-800 rounded-3xl shadow-2xl overflow-hidden">
+          <div className="p-8 md:p-10">
+            <div className="flex flex-col md:flex-row gap-8 items-center">
+              {/* Profile Image */}
+              <div className="relative group">
+                <div className="w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center overflow-hidden border-4 border-white/30 shadow-xl">
                   {basicInfo?.profilePhotoURL ? (
-                    <img 
-                      src={basicInfo.profilePhotoURL} 
-                      alt={`${getDisplayName()}'s profile`}
+                    <img
+                      src={basicInfo.profilePhotoURL}
+                      alt="Profile"
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-gray-400 text-lg font-semibold">No Photo</span>
+                    <div className="text-white/80 text-4xl font-bold">
+                      {getFirstName().charAt(0).toUpperCase()}
+                    </div>
                   )}
                 </div>
-                {images.length > 1 && (
-                  <>
-                    <button
-                      onClick={() => setCurrentImageIndex(prev => (prev - 1 + images.length) % images.length)}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all"
-                    >
-                      <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    <button
-                      onClick={() => setCurrentImageIndex(prev => (prev + 1) % images.length)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all"
-                    >
-                      <ChevronRight className="w-6 h-6" />
-                    </button>
-                  </>
-                )}
               </div>
-            </div>
 
-            {/* Name and Basic Info */}
-            <div className="flex-grow">
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                {getDisplayName()}
-              </h1>
-              <p className="text-xl text-gray-700 mb-1">Major: {profile?.major || 'Not specified'}</p>
-              <p className="text-xl text-gray-700 mb-1">College: {profile?.college || 'Not specified'}</p>
-              <p className="text-xl text-gray-700 mb-4">Graduation Year: {basicInfo?.graduationYear || 2029}</p>
-              
-              {/* Tags */}
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full text-gray-700 font-medium"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+              {/* Profile Info */}
+              <div className="text-white flex-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h1 className="text-3xl md:text-4xl font-bold mb-1">
+                      {basicInfo
+                        ? `${basicInfo.firstName} ${basicInfo.lastName}`
+                        : getFirstName()}
+                    </h1>
+                    <div className="flex items-center gap-2 text-white/90">
+                      <span>{profile.major || "Undeclared"}</span>
+                      <span>•</span>
+                      <span>
+                        Class of {basicInfo?.graduationYear || "20XX"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              )}
 
-              {/* Bio */}
-              <p className="text-gray-700 leading-relaxed">
-                {basicInfo?.bio || (profile?.hobbies 
-                  ? `Interested in ${profile.hobbies}. Looking for a compatible roommate!`
-                  : 'Cornell student looking for a compatible roommate!')}
-              </p>
+                {/* Tags */}
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full text-sm font-medium transition-colors"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Bio */}
+                <p className="mt-4 text-white/90 leading-relaxed max-w-2xl">
+                  {profile.bio ? profile.bio : "No bio provided"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Only show survey sections if profile data exists */}
-        {profile && (
-          <>
-            {/* Lifestyle Snapshot */}
-            <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Lifestyle Snapshot</h2>
-              <div className="border-2 border-red-600 rounded-xl p-6 space-y-3">
-                <div className="flex flex-wrap">
-                  <span className="font-semibold text-gray-900 w-64">Bedtime:</span>
-                  <span className="text-gray-700">{profile.bedtime || 'Not specified'}</span>
-                </div>
-                <div className="flex flex-wrap">
-                  <span className="font-semibold text-gray-900 w-64">Wake-up Time:</span>
-                  <span className="text-gray-700">{profile.wakeUpTime || 'Not specified'}</span>
-                </div>
-                <div className="flex flex-wrap">
-                  <span className="font-semibold text-gray-900 w-64">Room Tidiness:</span>
-                  <span className="text-gray-700">{profile.cleanliness || 'Not specified'}</span>
-                </div>
-                <div className="flex flex-wrap">
-                  <span className="font-semibold text-gray-900 w-64">Guest Policy:</span>
-                  <span className="text-gray-700">{profile.guests || profile.socialFrequency || 'Not specified'}</span>
-                </div>
-                <div className="flex flex-wrap">
-                  <span className="font-semibold text-gray-900 w-64">Room Loudness Preference:</span>
-                  <span className="text-gray-700">
-                    {profile.noiseTolerance === 'Needs quiet' ? 'Silent' : profile.musicPreference || 'Not specified'}
+        {/* Main Content Grid */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Left Column */}
+          <div className="space-y-6">
+            {/* Contact Card */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="bg-gray-50 px-6 py-4 border-b">
+                <h2 className="text-lg font-semibold text-gray-900">Contact</h2>
+              </div>
+              <div className="p-6 space-y-4">
+                {basicInfo?.email && (
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1 text-gray-400">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <a
+                        href={`mailto:${basicInfo.email}`}
+                        className="text-gray-700 hover:text-red-600 transition-colors break-all"
+                      >
+                        {basicInfo.email}
+                      </a>
+                    </div>
+                  </div>
+                )}
+                {basicInfo?.phone && (
+                  <div className="flex items-center gap-3">
+                    <div className="text-gray-400">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                      </svg>
+                    </div>
+                    <a
+                      href={`tel:${basicInfo.phone}`}
+                      className="text-gray-700 hover:text-red-600 transition-colors"
+                    >
+                      {basicInfo.phone}
+                    </a>
+                  </div>
+                )}
+                {basicInfo?.instagram && (
+                  <div className="flex items-center gap-3">
+                    <div className="text-gray-400">
+                      <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.415-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.976.045-1.505.207-1.858.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.976.207 1.504.344 1.858.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <a
+                      href={`https://instagram.com/${basicInfo.instagram}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-700 hover:text-red-600 transition-colors"
+                    >
+                      @{basicInfo.instagram}
+                    </a>
+                  </div>
+                )}
+                {!basicInfo?.email &&
+                  !basicInfo?.phone &&
+                  !basicInfo?.instagram && (
+                    <p className="text-gray-500 text-sm">
+                      No contact information provided
+                    </p>
+                  )}
+              </div>
+            </div>
+
+            {/* Lifestyle Card */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="bg-gray-50 px-6 py-4 border-b">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Lifestyle
+                </h2>
+              </div>
+              <div className="p-6 space-y-6">
+                <div className="space-y-1">
+                  <span className="text-sm font-medium text-gray-500">
+                    Sleep Schedule
                   </span>
+                  <p className="text-base font-medium text-gray-900">
+                    {profile.bedtime || "--:--"} -{" "}
+                    {profile.wakeUpTime || "--:--"}
+                  </p>
                 </div>
-                <div className="flex flex-wrap">
-                  <span className="font-semibold text-gray-900 w-64">Study Habits:</span>
-                  <span className="text-gray-700">{profile.studyLocation || 'Not specified'}</span>
+
+                <div className="space-y-1">
+                  <span className="text-sm font-medium text-gray-500">
+                    Cleanliness
+                  </span>
+                  <p className="text-base font-medium text-gray-900">
+                    {profile.cleanliness || "Not specified"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-sm font-medium text-gray-500">
+                    Noise Level
+                  </span>
+                  <p className="text-base font-medium text-gray-900">
+                    {profile.noiseTolerance || "Not specified"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-sm font-medium text-gray-500">
+                    Social Life
+                  </span>
+                  <p className="text-base font-medium text-gray-900">
+                    {profile.socialFrequency || "Not specified"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Middle Column */}
+          <div className="space-y-6">
+            {/* About Me */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="bg-gray-50 px-6 py-4 border-b">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  About Me
+                </h2>
+              </div>
+              <div className="p-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-medium text-gray-900">
+                      Personality Type
+                    </h3>
+                    <p className="text-gray-600 mt-1">
+                      {profile.personalityType || "Not specified"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-medium text-gray-900">
+                      Ideal Friday Night
+                    </h3>
+                    <p className="text-gray-600 mt-1">
+                      {profile.fridayNight || "Not specified"}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Non-Negotiables and Preferences */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
-              {/* Non-Negotiables */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Non-Negotiables</h2>
-                <div className="border-2 border-red-600 rounded-xl p-6 space-y-2">
+            {/* Room Preferences */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="bg-gray-50 px-6 py-4 border-b">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Room Preferences
+                </h2>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">
+                      Room Type
+                    </h3>
+                    <p className="mt-1 text-gray-900">
+                      {profile.roomType || "Not specified"}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">
+                      Dorm Preference
+                    </h3>
+                    <p className="mt-1 text-gray-900">
+                      {profile.desiredDorms?.join(", ") || "Not specified"}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">
+                      AC Required
+                    </h3>
+                    <p className="mt-1 text-gray-900">
+                      {profile.acRequirement || "Not specified"}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">
+                      Guests
+                    </h3>
+                    <p className="mt-1 text-gray-900">
+                      {profile.guests || "Not specified"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            {/* Non-Negotiables */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="bg-gray-50 px-6 py-4 border-b">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Non-Negotiables
+                </h2>
+              </div>
+              <div className="p-6">
+                <ul className="space-y-3">
                   {profile.noiseTolerance && (
-                    <p className="text-gray-700">• {profile.noiseTolerance}</p>
-                  )}
-                  {profile.guests && (
-                    <p className="text-gray-700">• Guest policy: {profile.guests}</p>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 h-5 w-5 text-red-600">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                      <span className="ml-3 text-gray-700">
+                        Noise Level: {profile.noiseTolerance}
+                      </span>
+                    </li>
                   )}
                   {profile.cleanliness && (
-                    <p className="text-gray-700">• {profile.cleanliness}</p>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 h-5 w-5 text-red-600">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                      <span className="ml-3 text-gray-700">
+                        Cleanliness: {profile.cleanliness}
+                      </span>
+                    </li>
+                  )}
+                  {profile.guests && (
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 h-5 w-5 text-red-600">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                      <span className="ml-3 text-gray-700">
+                        Guest Policy: {profile.guests}
+                      </span>
+                    </li>
                   )}
                   {profile.musicPreference && (
-                    <p className="text-gray-700">• {profile.musicPreference}</p>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 h-5 w-5 text-red-600">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                      <span className="ml-3 text-gray-700">
+                        Music: {profile.musicPreference}
+                      </span>
+                    </li>
                   )}
-                  {(!profile.noiseTolerance && !profile.guests && !profile.cleanliness && !profile.musicPreference) && (
-                    <p className="text-gray-500 italic">No non-negotiables specified</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Preferences */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Preferences</h2>
-                <div className="border-2 border-red-600 rounded-xl p-6 space-y-2">
-                  {profile.desiredDorms && profile.desiredDorms.length > 0 && (
-                    <p className="text-gray-700">• Prefers {profile.desiredDorms.join(', ')}</p>
-                  )}
-                  {profile.roomType && (
-                    <p className="text-gray-700">• Prefers {profile.roomType}</p>
-                  )}
-                  {profile.acRequirement && (
-                    <p className="text-gray-700">• {profile.acRequirement}</p>
-                  )}
-                  {profile.personalityType && (
-                    <p className="text-gray-700">• {profile.personalityType}</p>
-                  )}
-                  {profile.studyLocation && (
-                    <p className="text-gray-700">• Studies at {profile.studyLocation}</p>
-                  )}
-                  {(!profile.desiredDorms && !profile.roomType && !profile.acRequirement && !profile.personalityType && !profile.studyLocation) && (
-                    <p className="text-gray-500 italic">No preferences specified</p>
-                  )}
-                </div>
+                  {!profile.noiseTolerance &&
+                    !profile.cleanliness &&
+                    !profile.guests &&
+                    !profile.musicPreference && (
+                      <p className="text-gray-500 text-sm">
+                        No non-negotiables specified
+                      </p>
+                    )}
+                </ul>
               </div>
             </div>
 
-            {/* Get to Know Me */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Get to Know Me</h2>
-              <div className="border-2 border-red-600 rounded-xl p-6 space-y-4">
+            {/* Fun Facts */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="bg-gray-50 px-6 py-4 border-b">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Fun Facts
+                </h2>
+              </div>
+              <div className="p-6 space-y-4">
                 <div>
-                  <span className="font-semibold text-gray-900">Favorite Cornell study spot:</span>
-                  <p className="text-gray-700 mt-1">{profile.favoriteStudySpot || 'Not specified'}</p>
+                  <h3 className="font-medium text-gray-900">
+                    Favorite Study Spot
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    {profile.favoriteStudySpot || "Not specified"}
+                  </p>
                 </div>
                 <div>
-                  <span className="font-semibold text-gray-900">Ideal Friday night:</span>
-                  <p className="text-gray-700 mt-1">{profile.fridayNight || 'Not specified'}</p>
+                  <h3 className="font-medium text-gray-900">Pet Peeves</h3>
+                  <p className="text-gray-600 mt-1">
+                    {profile.petPeeves || "None specified"}
+                  </p>
                 </div>
                 <div>
-                  <span className="font-semibold text-gray-900">Pet peeve:</span>
-                  <p className="text-gray-700 mt-1">{profile.petPeeves || 'Not specified'}</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-900">Something I love:</span>
-                  <p className="text-gray-700 mt-1">{profile.hobbies || 'Not specified'}</p>
+                  <h3 className="font-medium text-gray-900">
+                    Something I Love
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    {profile.hobbies || "Not specified"}
+                  </p>
                 </div>
               </div>
             </div>
-          </>
-        )}
-
-        {/* Show message if no survey data */}
-        {!profile && basicInfo && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-            <p className="text-gray-600">This user hasn't completed their roommate survey yet.</p>
-          </div>
-        )}
-
-        {/* Contact Button */}
-        <div className="mt-8 bg-white rounded-2xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Contact Information</h2>
-          <div className="space-y-4">
-            {basicInfo?.email && (
-              <div className="flex items-center gap-3">
-                <span className="font-semibold text-gray-900 w-32">Email:</span>
-                <a href={`mailto:${basicInfo.email}`} className="text-red-600 hover:text-red-700 hover:underline">
-                  {basicInfo.email}
-                </a>
-              </div>
-            )}
-            {basicInfo?.phone && (
-              <div className="flex items-center gap-3">
-                <span className="font-semibold text-gray-900 w-32">Phone:</span>
-                <a href={`tel:${basicInfo.phone}`} className="text-red-600 hover:text-red-700 hover:underline">
-                  {basicInfo.phone}
-                </a>
-              </div>
-            )}
-            {basicInfo?.instagram && (
-              <div className="flex items-center gap-3">
-                <span className="font-semibold text-gray-900 w-32">Instagram:</span>
-                <a 
-                  href={`https://instagram.com/${basicInfo.instagram}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-red-600 hover:text-red-700 hover:underline"
-                >
-                  @{basicInfo.instagram}
-                </a>
-              </div>
-            )}
-            {(!basicInfo?.email && !basicInfo?.phone && !basicInfo?.instagram) && (
-              <p className="text-gray-500 text-center">No contact information provided</p>
-            )}
           </div>
         </div>
       </div>
@@ -339,4 +551,4 @@ const PublicProfile = () => {
   );
 };
 
-export default PublicProfile;
+export default Profile;
