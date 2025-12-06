@@ -1,20 +1,39 @@
 import { Shield, Heart, MessageCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 import ProfileCard from "../components/ProfileCard";
+import { getAllUsersBasicInfo } from "../services/surveyService";
 import "./index.css";
-const profiles = [
-  { id: 1, name: "Max Shi", major: "Computer Science", graduationYear: 2029 },
-  { id: 2, name: "Sarah Chen", major: "Engineering", graduationYear: 2028 },
-  { id: 3, name: "Alex Johnson", major: "Business", graduationYear: 2029 },
-  { id: 4, name: "Emma Davis", major: "Biology", graduationYear: 2027 },
-  { id: 5, name: "Michael Brown", major: "Economics", graduationYear: 2029 },
-  { id: 6, name: "Olivia Wilson", major: "Psychology", graduationYear: 2028 },
-];
+
+interface UserProfile {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  major: string;
+  graduationYear: number;
+  profilePhotoURL?: string;
+}
 
 const HomePage = () => {
+  const [profiles, setProfiles] = useState<UserProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProfiles = async () => {
+      try {
+        const users = await getAllUsersBasicInfo();
+        setProfiles(users);
+      } catch (error) {
+        console.error("Error loading profiles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfiles();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* --- YOUR ENTIRE JSX BELOW THIS IS UNCHANGED --- */}
-
       {/* Hero Section */}
       <section
         id="home"
@@ -35,7 +54,10 @@ const HomePage = () => {
               one match at a time.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-red-700 to-red-800 text-white px-8 py-4 rounded-xl hover:from-red-800 hover:to-red-900 transition-all shadow-lg hover:shadow-xl font-semibold text-lg">
+              <button
+                onClick={() => (window.location.href = "/signup")}
+                className="bg-gradient-to-r from-red-700 to-red-800 text-white px-8 py-4 rounded-xl hover:from-red-800 hover:to-red-900 transition-all shadow-lg hover:shadow-xl font-semibold text-lg"
+              >
                 Start Matching
               </button>
               <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl hover:border-red-700 hover:text-red-700 transition-all font-semibold text-lg bg-white">
@@ -51,7 +73,9 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-red-700 mb-2">2,500+</div>
+              <div className="text-4xl font-bold text-red-700 mb-2">
+                {profiles.length}+
+              </div>
               <div className="text-gray-600">Active Students</div>
             </div>
             <div>
@@ -71,24 +95,44 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Your Top Matches
+              Browse Profiles
             </h2>
             <p className="text-lg text-gray-600">
-              Students who match your preferences and lifestyle
+              Students looking for roommates at Cornell
             </p>
           </div>
 
-          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
-            {profiles.map((profile) => (
-              <div key={profile.id} className="flex-shrink-0 w-80">
-                <ProfileCard
-                  name={profile.name}
-                  major={profile.major}
-                  graduationYear={profile.graduationYear}
-                />
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+            </div>
+          ) : profiles.length > 0 ? (
+            <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+              {profiles.map((profile) => (
+                <div key={profile.userId} className="flex-shrink-0 w-80">
+                  <ProfileCard
+                    name={`${profile.firstName} ${profile.lastName}`}
+                    major={profile.major}
+                    graduationYear={profile.graduationYear}
+                    userId={profile.userId}
+                    photoURL={profile.profilePhotoURL}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600 mb-4">
+                No profiles available yet. Be the first to create one!
+              </p>
+              <button
+                onClick={() => (window.location.href = "/survey")}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors"
+              >
+                Complete Survey
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -215,7 +259,10 @@ const HomePage = () => {
             Join thousands of Cornell students who've found their ideal living
             situation through our platform.
           </p>
-          <button className="bg-white text-red-700 px-10 py-4 rounded-xl hover:bg-gray-50 transition-all text-lg font-bold shadow-xl hover:shadow-2xl hover:scale-105">
+          <button
+            onClick={() => (window.location.href = "/survey")}
+            className="bg-white text-red-700 px-10 py-4 rounded-xl hover:bg-gray-50 transition-all text-lg font-bold shadow-xl hover:shadow-2xl hover:scale-105"
+          >
             Get Started Today
           </button>
         </div>
