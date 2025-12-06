@@ -6,6 +6,7 @@ import { getUserSurvey } from "../services/surveyService";
 import { getUserBasicInfo } from "../services/userService";
 import { SurveyResponse } from "./Survey";
 import { useNavigate, useParams } from "react-router-dom";
+import { calculateMatchScore } from "../services/similarityService";
 interface ProfileData extends SurveyResponse {
   firstName?: string;
   lastName?: string;
@@ -22,6 +23,7 @@ const Profile = () => {
   const [basicInfo, setBasicInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [similarityScore, setSimilarityScore] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,7 +42,14 @@ const Profile = () => {
 
         // Set basic info separately if needed
         setBasicInfo(userBasicInfo);
-
+        const currentUserSurvey = await getUserSurvey(currentUser.uid);
+        if (currentUserSurvey && survey) {
+          const score = calculateMatchScore(
+            currentUserSurvey.responses,
+            survey.responses
+          );
+          setSimilarityScore(score);
+        }
         // Merge both data sources into profile state
         setProfile((prev) => ({
           ...prev, // Keep any existing profile data
@@ -132,7 +141,18 @@ const Profile = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Header Section with Gradient Background */}
-        <div className="bg-gradient-to-r from-red-600 to-red-800 rounded-3xl shadow-2xl overflow-hidden">
+        <div className="bg-gradient-to-r from-red-600 to-red-800 rounded-3xl shadow-2xl overflow-hidden relative">
+          {/* Similarity Score Badge */}
+          {similarityScore !== null && (
+            <div className="absolute top-6 right-6 bg-white/20 backdrop-blur-sm rounded-2xl w-32 h-32 flex flex-col items-center justify-center border-2 border-white/30 shadow-lg">
+              <span className="text-white/80 text-md font-medium">
+                Match Score
+              </span>
+              <span className="text-white text-4xl font-bold">
+                {Math.round(similarityScore * 100)}
+              </span>
+            </div>
+          )}
           <div className="p-8 md:p-10">
             <div className="flex flex-col md:flex-row gap-8 items-center">
               {/* Profile Image */}

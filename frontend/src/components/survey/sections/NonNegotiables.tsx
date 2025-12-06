@@ -117,13 +117,14 @@ const NonNegotiables = ({ responses, onUpdate }: NonNegotiablesProps) => {
 
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">Noise in Room</h3>
-        <p className="text-sm text-gray-500">I cannot live with someone who:</p>
+        <p className="text-sm text-gray-500">
+          On a typical day, my room's noise level would ideally be:
+        </p>
         <div className="space-y-3 mt-3">
           {[
-            "Plays music/sound out loud regularly",
-            "Has loud phone calls in the room",
-            "Has friends over weekly",
-            "Snores loudly",
+            "Loud (Social hub)",
+            "Moderate (Quiet conversation)",
+            "Quiet (No noise)",
             "I’m fine with all of these",
           ].map((option) => (
             <label

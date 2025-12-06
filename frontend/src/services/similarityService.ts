@@ -35,12 +35,122 @@ export const calculateSimilarityScores = async (currentUserId: string) => {
   return scores.sort((a, b) => b.score - a.score); // Sort by highest score first
 };
 
-const calculateMatchScore = (
+// Weighted scoring for different categories
+const WEIGHTS = {
+  // Sleep schedule (high importance)
+  sleepSchedule: 20,
+
+  // Cleanliness (high importance)
+  cleanliness: 20,
+
+  // Social preferences (medium importance)
+  noiseTolerance: 15,
+};
+
+export const calculateMatchScore = (
   userA: SurveyResponse,
   userB: SurveyResponse
 ): number => {
   let totalScore = 0;
   let maxPossibleScore = 0;
+
+  // 1. Sleep Schedule Compatibility (high weight)
+  if (userA.bedtime && userB.bedtime && userA.wakeUpTime && userB.wakeUpTime) {
+    // Map bedtime options to numerical values (hours, where 22 = 10 PM, 24 = 12 AM, etc.)
+    const bedtimeMap: Record<string, number> = {
+      "Before 11 PM": 22,
+      "Before 1 AM": 24,
+      "Before 3 AM": 26,
+      "Anytime is fine": 24, // Treat 'Anytime' as average of the range
+    };
+
+    // Map wake-up time options to numerical values (hours)
+    const wakeupMap: Record<string, number> = {
+      "Before 8 AM": 8,
+      "Before 10 AM": 10,
+      "Before noon": 12,
+      "Anytime is fine": 10, // Treat 'Anytime' as average of the range
+    };
+
+    // Calculate bedtime compatibility (0-1, where 1 is identical, 0 is max difference)
+    const bedtimeDiff = Math.abs(
+      bedtimeMap[userA.bedtime] - bedtimeMap[userB.bedtime]
+    );
+    const maxBedtimeDiff = 4; // Max possible difference (26-22=4)
+    const bedTimeScore = Math.max(0, 1 - bedtimeDiff / maxBedtimeDiff);
+
+    // Calculate wake-up time compatibility (0-1, where 1 is identical, 0 is max difference)
+    const wakeupDiff = Math.abs(
+      wakeupMap[userA.wakeUpTime] - wakeupMap[userB.wakeUpTime]
+    );
+    const maxWakeupDiff = 4; // Max possible difference (12-8=4)
+    const wakeupTimeScore = Math.max(0, 1 - wakeupDiff / maxWakeupDiff);
+
+    // Calculate overall sleep compatibility score (weighted average)
+    const sleepScore = bedTimeScore * 0.6 + wakeupTimeScore * 0.4;
+
+    // Add to total score with high weight
+    totalScore += sleepScore * WEIGHTS.sleepSchedule;
+    maxPossibleScore += WEIGHTS.sleepSchedule;
+  }
+
+  // 2. Cleanliness (high weight)
+  if (userA.cleanliness && userB.cleanliness) {
+    // Map cleanliness options to numerical values (1-4)
+    const cleanlinessMap: Record<string, number> = {
+      "Very tidy (everything in place)": 4,
+      "Moderately tidy (clean weekly)": 3,
+      "Lightly messy is fine": 2,
+      "I don't care": 2.5, // Average of the scale
+    };
+
+    // Get numerical values for both users
+    const cleanA = cleanlinessMap[userA.cleanliness];
+    const cleanB = cleanlinessMap[userB.cleanliness];
+
+    if (cleanA !== undefined && cleanB !== undefined) {
+      // Calculate score based on difference (1 = identical, 0 = max difference)
+      const maxDiff = 2; // Max possible difference (4-2=2)
+      const diff = Math.abs(cleanA - cleanB);
+      const cleanScore = 1 - diff / maxDiff;
+
+      // Add to total score with high weight
+      totalScore += cleanScore * WEIGHTS.cleanliness;
+      maxPossibleScore += WEIGHTS.cleanliness;
+    }
+  }
+
+  // 5. Noise Tolerance
+  if (userA.noiseTolerance && userB.noiseTolerance) {
+    // Map noise tolerance options to numerical values (1-4)
+    const noiseToleranceMap: Record<string, number> = {
+      "Loud (Social hub)": 1,
+      "Moderate (Quiet conversation)": 2,
+      "Quiet (No noise)": 3,
+      "I'm fine with all of these": 2, // Middle ground
+    };
+
+    // Get numerical values for both users
+    const noiseA = noiseToleranceMap[userA.noiseTolerance];
+    const noiseB = noiseToleranceMap[userB.noiseTolerance];
+
+    if (noiseA !== undefined && noiseB !== undefined) {
+      // Calculate score based on difference (1 = identical, 0 = max difference)
+      // For noise tolerance, we'll be more lenient with differences
+      const maxDiff = 2; // Max possible difference (3-1=2)
+      const diff = Math.abs(noiseA - noiseB);
+
+      // More gradual decrease in score for noise tolerance
+      const noiseScore = 1 - diff / (maxDiff * 1.5);
+
+      // Ensure score doesn't go below 0.3 (more lenient than cleanliness)
+      const finalScore = Math.max(0.3, noiseScore);
+
+      // Add to total score
+      totalScore += finalScore * WEIGHTS.noiseTolerance;
+      maxPossibleScore += WEIGHTS.noiseTolerance;
+    }
+  }
 
   // Gender: non-negotiable
   let genderCompatible = false;
@@ -85,31 +195,22 @@ const calculateMatchScore = (
     }
   }
 
-  // Example: Compare sleep schedules
-  if (userA.bedtime && userB.bedtime) {
-    const timeDiff = Math.abs(
-      parseTimeToMinutes(userA.bedtime) - parseTimeToMinutes(userB.bedtime)
-    );
-    // Closer bedtimes = higher score (max 1 hour difference)
-    const timeScore = Math.max(0, 60 - timeDiff) / 60;
-    totalScore += timeScore * 10; // Weight for this category
-    maxPossibleScore += 10;
-  }
-
-  // Add more comparisons for other important factors
-  if (userA.cleanliness && userB.cleanliness) {
-    const cleanDiff = Math.abs(
-      Number(userA.cleanliness) - Number(userB.cleanliness)
-    );
-    const cleanScore = 1 - cleanDiff / 4; // Normalize to 0-1
-    totalScore += cleanScore * 15; // Higher weight for cleanliness
-    maxPossibleScore += 15;
-  }
-
-  // Add more factors here...
-
   // Calculate final score (0-100)
-  return maxPossibleScore > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
+  if (maxPossibleScore === 0) return 0;
+
+  // Normalize score to 0-100 range
+  let finalScore = (totalScore / maxPossibleScore) * 100;
+
+  // Apply non-linear scaling to make differences more noticeable
+  // This makes scores below 50% drop faster, and above 50% rise faster
+  if (finalScore < 50) {
+    finalScore = 50 * Math.pow(finalScore / 50, 0.8);
+  } else {
+    finalScore = 100 - 50 * Math.pow((100 - finalScore) / 50, 1.2);
+  }
+
+  // Ensure score is within bounds
+  return Math.min(100, Math.max(0, Math.round(finalScore)));
 };
 
 const parseTimeToMinutes = (timeStr: string): number => {
