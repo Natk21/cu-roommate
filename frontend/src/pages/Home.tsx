@@ -1,5 +1,7 @@
 import { Shield, Heart, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import ProfileCard from "../components/ProfileCard";
 import { getAllUsersBasicInfo } from "../services/surveyService";
 import "./index.css";
@@ -14,6 +16,8 @@ interface UserProfile {
 }
 
 const HomePage = () => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,7 +25,11 @@ const HomePage = () => {
     const loadProfiles = async () => {
       try {
         const users = await getAllUsersBasicInfo();
-        setProfiles(users);
+        // Filter out the current user if they are logged in
+        const filteredUsers = currentUser
+          ? users.filter((user) => user.userId !== currentUser.uid)
+          : users;
+        setProfiles(filteredUsers);
       } catch (error) {
         console.error("Error loading profiles:", error);
       } finally {
@@ -30,7 +38,7 @@ const HomePage = () => {
     };
 
     loadProfiles();
-  }, []);
+  }, [currentUser]); // Add currentUser to dependency array
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -55,13 +63,16 @@ const HomePage = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => (window.location.href = "/signup")}
+                onClick={() => {
+                  if (currentUser) {
+                    navigate("/matches");
+                  } else {
+                    navigate("/signup");
+                  }
+                }}
                 className="bg-gradient-to-r from-red-700 to-red-800 text-white px-8 py-4 rounded-xl hover:from-red-800 hover:to-red-900 transition-all shadow-lg hover:shadow-xl font-semibold text-lg"
               >
-                Start Matching
-              </button>
-              <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl hover:border-red-700 hover:text-red-700 transition-all font-semibold text-lg bg-white">
-                Learn More
+                {currentUser ? "View Matches" : "Start Matching"}
               </button>
             </div>
           </div>
@@ -74,7 +85,8 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
               <div className="text-4xl font-bold text-red-700 mb-2">
-                {profiles.length}+
+                {/* {profiles.length}+ */}
+                100+
               </div>
               <div className="text-gray-600">Active Students</div>
             </div>
@@ -108,17 +120,20 @@ const HomePage = () => {
             </div>
           ) : profiles.length > 0 ? (
             <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
-              {profiles.map((profile) => (
-                <div key={profile.userId} className="flex-shrink-0 w-80">
-                  <ProfileCard
-                    name={`${profile.firstName} ${profile.lastName}`}
-                    major={profile.major}
-                    graduationYear={profile.graduationYear}
-                    userId={profile.userId}
-                    photoURL={profile.profilePhotoURL}
-                  />
-                </div>
-              ))}
+              {profiles
+                .sort(() => 0.5 - Math.random()) // Shuffle the array
+                .slice(0, 7) // Take first 7
+                .map((profile) => (
+                  <div key={profile.userId} className="flex-shrink-0 w-80">
+                    <ProfileCard
+                      name={`${profile.firstName} ${profile.lastName}`}
+                      major={profile.major}
+                      graduationYear={profile.graduationYear}
+                      userId={profile.userId}
+                      photoURL={profile.profilePhotoURL}
+                    />
+                  </div>
+                ))}
             </div>
           ) : (
             <div className="text-center py-12">
@@ -260,7 +275,7 @@ const HomePage = () => {
             situation through our platform.
           </p>
           <button
-            onClick={() => (window.location.href = "/survey")}
+            onClick={() => (window.location.href = "/basic-info")}
             className="bg-white text-red-700 px-10 py-4 rounded-xl hover:bg-gray-50 transition-all text-lg font-bold shadow-xl hover:shadow-2xl hover:scale-105"
           >
             Get Started Today

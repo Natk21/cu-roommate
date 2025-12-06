@@ -52,14 +52,17 @@ export const submitBasicInfo = async (
       lastName: basicInfo.lastName,
       graduationYear: basicInfo.graduationYear,
       bio: basicInfo.bio,
-      profilePhotoURL: basicInfo.profilePhotoURL || "",
+      profilePhotoURL: basicInfo.profilePhotoURL,
+      email: basicInfo.email || "",
+      phone: basicInfo.phone || "",
+      instagram: basicInfo.instagram || "",
       updatedAt: new Date().toISOString(),
     };
 
     console.log("Prepared user data:", userData);
 
     let docRef: DocumentReference<DocumentData>;
-    
+
     if (!querySnapshot.empty) {
       // Update existing document
       console.log("Updating existing document");
@@ -114,17 +117,47 @@ export const getUserBasicInfo = async (
 // Get all users' basic info (for displaying on homepage/matches)
 export const getAllUsersBasicInfo = async (): Promise<UserDocument[]> => {
   try {
-    const q = query(collection(db, USERS_COLLECTION));
+    const querySnapshot = await getDocs(collection(db, USERS_COLLECTION));
+    return querySnapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as UserDocument
+    );
+  } catch (error) {
+    console.error("Error getting users:", error);
+    return [];
+  }
+};
+
+// Update user's profile photo
+export const updateUserProfilePhoto = async (
+  userId: string,
+  photoURL: string
+): Promise<{ success: boolean }> => {
+  try {
+    // Find the user document
+    const q = query(
+      collection(db, USERS_COLLECTION),
+      where("userId", "==", userId)
+    );
     const querySnapshot = await getDocs(q);
 
-    const users: UserDocument[] = [];
-    querySnapshot.forEach((docSnap) => {
-      users.push({ id: docSnap.id, ...docSnap.data() } as UserDocument);
+    if (querySnapshot.empty) {
+      throw new Error("User not found");
+    }
+
+    // Update the profile photo URL
+    const userDoc = querySnapshot.docs[0];
+    await updateDoc(doc(db, USERS_COLLECTION, userDoc.id), {
+      profilePhotoURL: photoURL,
+      updatedAt: new Date().toISOString(),
     });
 
-    return users;
+    return { success: true };
   } catch (error) {
-    console.error("Error getting all users:", error);
+    console.error("Error updating profile photo:", error);
     throw error;
   }
 };

@@ -18,7 +18,7 @@ export interface BasicUserInfo {
 const BasicInfoSurvey = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState<BasicUserInfo>({
     firstName: "",
     lastName: "",
@@ -34,6 +34,12 @@ const BasicInfoSurvey = () => {
   const [error, setError] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     const checkBasicInfo = async () => {
@@ -42,8 +48,23 @@ const BasicInfoSurvey = () => {
         try {
           const basicInfo = await getUserBasicInfo(currentUser.uid);
           if (basicInfo) {
-            // User already completed basic info, redirect to main survey
-            navigate("/survey");
+            // Auto-fill the form with existing user data
+            setFormData((prev) => ({
+              ...prev,
+              ...basicInfo,
+              // Ensure graduationYear is a number
+              graduationYear:
+                typeof basicInfo.graduationYear === "number"
+                  ? basicInfo.graduationYear
+                  : 2029, // Default value if not provided
+            }));
+
+            // Set photo preview if profile photo exists
+            if (basicInfo.profilePhotoURL) {
+              setPhotoPreview(basicInfo.profilePhotoURL);
+            }
+          } else {
+            // User hasn't completed basic info, do nothing
           }
         } catch (error) {
           console.error("Error checking basic info:", error);
@@ -59,7 +80,9 @@ const BasicInfoSurvey = () => {
   }, [currentUser, navigate]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -74,14 +97,14 @@ const BasicInfoSurvey = () => {
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+
           // Resize to max 300x300 while maintaining aspect ratio
           let width = img.width;
           let height = img.height;
           const maxSize = 300;
-          
+
           if (width > height) {
             if (width > maxSize) {
               height *= maxSize / width;
@@ -93,20 +116,28 @@ const BasicInfoSurvey = () => {
               height = maxSize;
             }
           }
-          
+
           canvas.width = width;
           canvas.height = height;
           ctx?.drawImage(img, 0, 0, width, height);
-          
+
           // Convert to base64 with heavy compression
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
-          
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.6);
+
           console.log("Original size:", file.size, "bytes");
-          console.log("Compressed size:", compressedBase64.length, "characters");
-          
+          console.log(
+            "Compressed size:",
+            compressedBase64.length,
+            "characters"
+          );
+
           // Check if still too large (aiming for under 200KB in base64)
           if (compressedBase64.length > 200000) {
-            reject(new Error("Image is still too large after compression. Please use a smaller image."));
+            reject(
+              new Error(
+                "Image is still too large after compression. Please use a smaller image."
+              )
+            );
           } else {
             resolve(compressedBase64);
           }
@@ -137,7 +168,7 @@ const BasicInfoSurvey = () => {
       try {
         setError(null);
         const compressedBase64 = await compressImage(file);
-        
+
         setPhotoPreview(compressedBase64);
         setFormData((prev) => ({
           ...prev,
@@ -155,7 +186,7 @@ const BasicInfoSurvey = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!currentUser) {
       setError("You must be logged in to submit");
       return;
@@ -188,15 +219,16 @@ const BasicInfoSurvey = () => {
     try {
       console.log("Attempting to submit with user:", currentUser.uid);
       console.log("Form data:", formData);
-      
+
       const result = await submitBasicInfo(currentUser.uid, formData);
       console.log("Submit result:", result);
-      
+
       // Redirect to main survey
       navigate("/survey");
+      scrollToTop();
     } catch (error) {
       console.error("Error submitting basic info:", error);
-      
+
       // Show detailed error message
       if (error instanceof Error) {
         setError(`Failed to submit: ${error.message}`);
@@ -266,16 +298,20 @@ const BasicInfoSurvey = () => {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl shadow-lg p-8"
+        >
           {/* Profile Photo */}
           <div className="mb-8">
             <label className="block text-lg font-semibold text-gray-900 mb-3">
               Profile Photo (Optional)
             </label>
             <p className="text-sm text-gray-600 mb-4">
-              Add a photo to help others recognize you. Images will be automatically compressed.
+              Add a photo to help others recognize you. Images will be
+              automatically compressed.
             </p>
-            
+
             <div className="flex flex-col items-center">
               <div className="w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center mb-4 overflow-hidden">
                 {photoPreview ? (
@@ -288,10 +324,10 @@ const BasicInfoSurvey = () => {
                   <span className="text-gray-400 text-sm">No Photo</span>
                 )}
               </div>
-              
+
               <div className="flex gap-2">
                 <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg transition-colors">
-                  <span>{photoPreview ? 'Change Photo' : 'Choose Photo'}</span>
+                  <span>{photoPreview ? "Change Photo" : "Choose Photo"}</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -299,13 +335,13 @@ const BasicInfoSurvey = () => {
                     className="hidden"
                   />
                 </label>
-                
+
                 {photoPreview && (
                   <button
                     type="button"
                     onClick={() => {
                       setPhotoPreview(null);
-                      setFormData(prev => ({ ...prev, profilePhotoURL: "" }));
+                      setFormData((prev) => ({ ...prev, profilePhotoURL: "" }));
                     }}
                     className="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg transition-colors"
                   >
@@ -313,7 +349,9 @@ const BasicInfoSurvey = () => {
                   </button>
                 )}
               </div>
-              <p className="text-xs text-gray-500 mt-2">Will be resized to 300x300 and compressed</p>
+              <p className="text-xs text-gray-500 mt-2">
+                Will be resized to 300x300 and compressed
+              </p>
             </div>
           </div>
 
@@ -334,7 +372,7 @@ const BasicInfoSurvey = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                placeholder="Max"
+                placeholder="First Name"
               />
             </div>
 
@@ -353,7 +391,7 @@ const BasicInfoSurvey = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                placeholder="Shi"
+                placeholder="Last Name"
               />
             </div>
           </div>
@@ -394,8 +432,9 @@ const BasicInfoSurvey = () => {
               Bio <span className="text-red-600">*</span>
             </label>
             <p className="text-sm text-gray-600 mb-3">
-              Tell potential roommates about yourself! Share your interests, hobbies, 
-              what you're studying, and what you're looking for in a roommate.
+              Tell potential roommates about yourself! Share your interests,
+              hobbies, what you're studying, and what you're looking for in a
+              roommate.
             </p>
             <textarea
               id="bio"
@@ -409,7 +448,9 @@ const BasicInfoSurvey = () => {
             />
             <div className="flex justify-between mt-2">
               <p className="text-sm text-gray-500">Minimum 50 characters</p>
-              <p className={`text-sm ${formData.bio.length >= 50 ? 'text-green-600' : 'text-gray-500'}`}>
+              <p
+                className={`text-sm ${formData.bio.length >= 50 ? "text-green-600" : "text-gray-500"}`}
+              >
                 {formData.bio.length} / 50
               </p>
             </div>
@@ -417,7 +458,9 @@ const BasicInfoSurvey = () => {
 
           {/* Contact Information Section */}
           <div className="mb-6 border-t pt-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Contact Information</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Contact Information
+            </h3>
             <p className="text-sm text-gray-600 mb-4">
               How can potential roommates reach you? (All optional)
             </p>
@@ -500,7 +543,7 @@ const BasicInfoSurvey = () => {
                   Saving...
                 </>
               ) : (
-                "Continue to Survey →"
+                "Save & Continue →"
               )}
             </button>
           </div>
@@ -508,7 +551,8 @@ const BasicInfoSurvey = () => {
 
         {/* Help Text */}
         <p className="text-center text-sm text-gray-500 mt-6">
-          Your information will be visible to other Cornell students looking for roommates
+          Your information will be visible to other Cornell students looking for
+          roommates
         </p>
       </div>
     </div>

@@ -128,6 +128,7 @@ const Survey = () => {
       await submitSurvey(currentUser.uid, responses);
       setHasSubmitted(true);
       setSubmitSuccess(true);
+      scrollToTop();
       return true;
     } catch (error) {
       setHasSubmitted(false);
@@ -221,7 +222,10 @@ const Survey = () => {
             Edit Again
           </button>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => {
+              navigate("/");
+              scrollToTop();
+            }}
             className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
           >
             Back to Home

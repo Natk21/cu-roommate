@@ -4,6 +4,12 @@ import { useAuth } from "../../contexts/AuthContext";
 
 const RootLayout = () => {
   const { currentUser, loading, signOutUser } = useAuth();
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   if (loading) {
     return <div>Loading...</div>; // Or a proper loading spinner
@@ -21,6 +27,7 @@ const RootLayout = () => {
                 className="w-8 h-8 rounded-lg object-cover"
               />
               <Link
+                onClick={() => scrollToTop()}
                 to="/"
                 className="text-xl font-bold bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
               >
@@ -29,12 +36,15 @@ const RootLayout = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
-              <Link
-                to="/matches"
-                className="text-gray-700 hover:text-red-700 transition-colors font-medium"
-              >
-                Matches
-              </Link>
+              {currentUser && (
+                <Link
+                  onClick={() => scrollToTop()}
+                  to="/matches"
+                  className="text-gray-700 hover:text-red-700 transition-colors font-medium"
+                >
+                  Matches
+                </Link>
+              )}
               {currentUser ? (
                 // Show Profile and Sign Out when logged in
                 <div className="flex items-center space-x-4">
@@ -91,7 +101,7 @@ const RootLayout = () => {
                   CURoommate
                 </Link>
               </div>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 text-sm mt-2">
                 Connecting Cornell students for better living experiences.
               </p>
             </div>
