@@ -25,7 +25,11 @@ const HomePage = () => {
     const loadProfiles = async () => {
       try {
         const users = await getAllUsersBasicInfo();
-        setProfiles(users);
+        // Filter out the current user if they are logged in
+        const filteredUsers = currentUser
+          ? users.filter((user) => user.userId !== currentUser.uid)
+          : users;
+        setProfiles(filteredUsers);
       } catch (error) {
         console.error("Error loading profiles:", error);
       } finally {
@@ -34,7 +38,7 @@ const HomePage = () => {
     };
 
     loadProfiles();
-  }, []);
+  }, [currentUser]); // Add currentUser to dependency array
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

@@ -149,7 +149,7 @@ const Profile = () => {
                 Match Score
               </span>
               <span className="text-white text-4xl font-bold">
-                {Math.round(similarityScore * 100)}
+                {Math.round(similarityScore)}
               </span>
             </div>
           )}
