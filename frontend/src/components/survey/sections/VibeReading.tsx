@@ -42,7 +42,6 @@ const VibeReading = ({ responses, onUpdate }: VibeReadingProps) => {
                 "Social hub",
                 "Minimalist",
                 "Artsy/creative",
-                "Gym-focused",
               ].map((option) => (
                 <label
                   key={option}
@@ -114,8 +113,7 @@ const VibeReading = ({ responses, onUpdate }: VibeReadingProps) => {
                 "Gaming",
                 "Hanging with friends",
                 "Out in Collegetown",
-                "Watching Netflix",
-                "Cooking / chilling in",
+                "Binging Netflix",
               ].map((option) => (
                 <label
                   key={option}

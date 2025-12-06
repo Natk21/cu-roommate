@@ -7,7 +7,13 @@ interface CorePreferencesProps {
   responses: SurveyResponse;
   onUpdate: (updates: Partial<SurveyResponse>) => void;
 }
-
+const roomTypes = [
+  "Single",
+  "Double",
+  "Suite",
+  "Traditional Hall",
+  "No preference",
+];
 const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
   const handleChange = (field: keyof SurveyResponse) => (value: any) => {
     onUpdate({ [field]: value });
@@ -79,42 +85,6 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-lg font-medium text-gray-900">Study Habits</h3>
-            <p className="text-sm text-gray-500 mb-3">
-              Where do you usually study?
-            </p>
-            <div className="space-y-3 pl-4">
-              {[
-                "In the room",
-                "Olin/Uris",
-                "Duffield/CS spaces",
-                "Mann Library",
-                "eHub or cafés",
-                "Other (please specify)",
-              ].map((option) => (
-                <label key={option} className="flex items-center space-x-3">
-                  <input
-                    type="radio"
-                    name="studyLocation"
-                    checked={responses.studyLocation === option}
-                    onChange={() => handleChange("studyLocation")(option)}
-                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
-                  />
-                  <span className="text-gray-700">{option}</span>
-                </label>
-              ))}
-            </div>
-            <SliderQuestion
-              question="How important is matching study locations?"
-              minLabel="Not important"
-              maxLabel="Very important"
-              value={responses.studyLocationImportance || 3}
-              onChange={handleChange("studyLocationImportance")}
-              className="pl-4"
-            />
-          </div>
-
-          <div className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
               Introvert / Extrovert Scale
             </h3>
@@ -180,13 +150,6 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
               maxLabel="Very tolerant"
               value={responses.noiseToleranceLevel || 3}
               onChange={handleChange("noiseToleranceLevel")}
-            />
-            <SliderQuestion
-              question="Mess Tolerance"
-              minLabel="Needs very clean"
-              maxLabel="Doesn't mind clutter"
-              value={responses.messTolerance || 3}
-              onChange={handleChange("messTolerance")}
             />
           </div>
         </div>
@@ -315,6 +278,28 @@ const CorePreferences = ({ responses, onUpdate }: CorePreferencesProps) => {
                     className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
                   />
                   <span className="text-gray-700">{option}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-lg font-medium text-gray-900">
+              Room Type Preference
+            </h3>
+            <div className="space-y-3 pl-4">
+              {roomTypes.map((type) => (
+                <label
+                  key={type}
+                  className="flex items-center space-x-3 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <input
+                    type="radio"
+                    name="roomType"
+                    checked={responses.roomType === type}
+                    onChange={() => handleChange("roomType")(type)}
+                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
+                  />
+                  <span className="text-gray-700">{type}</span>
                 </label>
               ))}
             </div>

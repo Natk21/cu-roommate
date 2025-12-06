@@ -5,7 +5,6 @@ import SurveyLayout from "../components/survey/SurveyLayout";
 import NonNegotiables from "../components/survey/sections/NonNegotiables";
 import CorePreferences from "../components/survey/sections/CorePreferences";
 import VibeReading from "../components/survey/sections/VibeReading";
-import DormLogistics from "../components/survey/sections/DormLogistics";
 import OptionalPersonality from "../components/survey/sections/OptionalPersonality";
 
 // Define the SurveyResponse interface
@@ -27,13 +26,10 @@ export interface SurveyResponse {
   cleanlinessSelfRating?: number;
   cleaningFrequency?: number;
   cleanlinessMatchImportance?: number;
-  studyLocation?: string;
-  studyLocationImportance?: number;
   personalityType?: string;
   socialFrequency?: string;
   socialHabitsImportance?: number;
   noiseToleranceLevel?: number;
-  messTolerance?: number;
   major?: string;
   college?: string;
   workloadStyle?: string;
@@ -171,12 +167,6 @@ const Survey = () => {
       title: "Vibe Reading",
       component: (
         <VibeReading responses={responses} onUpdate={handleResponseUpdate} />
-      ),
-    },
-    {
-      title: "Dorm & Logistics",
-      component: (
-        <DormLogistics responses={responses} onUpdate={handleResponseUpdate} />
       ),
     },
     {

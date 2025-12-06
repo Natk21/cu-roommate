@@ -60,6 +60,7 @@ const calculateMatchScore = (
     if (prefA === "any gender" || prefB === "any gender") {
       genderCompatible = true;
     }
+
     // If preference is "my gender", check if genders match
     else if (
       prefA === "my gender" &&
