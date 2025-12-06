@@ -11,6 +11,7 @@ import OptionalPersonality from "../components/survey/sections/OptionalPersonali
 // Define the SurveyResponse interface
 export interface SurveyResponse {
   // Non-negotiables
+  gender?: string;
   genderPreference?: string;
   wakeUpTime?: string;
   bedtime?: string;

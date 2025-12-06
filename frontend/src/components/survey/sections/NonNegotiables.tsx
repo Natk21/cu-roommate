@@ -13,15 +13,30 @@ const NonNegotiables = ({ responses, onUpdate }: NonNegotiablesProps) => {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h3 className="text-lg font-medium text-gray-900">
-          1. Gender Preference
-        </h3>
+        <h3 className="text-lg font-medium text-gray-900">Your Gender</h3>
         <div className="space-y-3 mt-3">
-          {[
-            "I’m open to any",
-            "I prefer roommates of my gender",
-            "I require roommates of my gender",
-          ].map((option) => (
+          {["Male", "Female", "Other"].map((option) => (
+            <label
+              key={option}
+              className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors"
+            >
+              <input
+                type="radio"
+                name="genderPreference"
+                checked={responses.genderPreference === option}
+                onChange={() => handleChange("genderPreference")(option)}
+                className="h-5 w-5 text-red-600 focus:ring-red-500 border-gray-300"
+              />
+              <span className="text-gray-700">{option}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="text-lg font-medium text-gray-900">Gender Preference</h3>
+        <div className="space-y-3 mt-3">
+          {["My gender", "Any gender"].map((option) => (
             <label
               key={option}
               className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors"
@@ -72,7 +87,7 @@ const NonNegotiables = ({ responses, onUpdate }: NonNegotiablesProps) => {
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-lg font-medium text-gray-900">3. Bedtime Range</h3>
+        <h3 className="text-lg font-medium text-gray-900">Bedtime Range</h3>
         <p className="text-sm text-gray-500">
           What's the latest acceptable bedtime for your roommate?
         </p>

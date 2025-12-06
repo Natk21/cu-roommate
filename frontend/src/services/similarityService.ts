@@ -42,6 +42,14 @@ const calculateMatchScore = (
   let totalScore = 0;
   let maxPossibleScore = 0;
 
+  // Gender: non-negotiable
+  if (userA.genderPreference && userB.genderPreference) {
+    const genderScore =
+      userA.genderPreference === userB.genderPreference ? 1 : 0;
+    totalScore += genderScore * 10; // Weight for this category
+    maxPossibleScore += 10;
+  }
+
   // Example: Compare sleep schedules
   if (userA.bedtime && userB.bedtime) {
     const timeDiff = Math.abs(
