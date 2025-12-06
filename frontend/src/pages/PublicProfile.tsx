@@ -144,11 +144,11 @@ const Profile = () => {
         <div className="bg-gradient-to-r from-red-600 to-red-800 rounded-3xl shadow-2xl overflow-hidden relative">
           {/* Similarity Score Badge */}
           {similarityScore !== null && (
-            <div className="absolute top-6 right-6 bg-white/20 backdrop-blur-sm rounded-2xl w-32 h-32 flex flex-col items-center justify-center border-2 border-white/30 shadow-lg">
+            <div className="absolute top-1/2 -translate-y-1/2 right-12 bg-white/20 backdrop-blur-sm rounded-2xl w-36 h-36 flex flex-col items-center justify-center border-2 border-white/30 shadow-lg">
               <span className="text-white/80 text-md font-medium">
                 Match Score
               </span>
-              <span className="text-white text-4xl font-bold">
+              <span className="text-white text-5xl font-bold">
                 {Math.round(similarityScore)}
               </span>
             </div>
@@ -206,7 +206,7 @@ const Profile = () => {
                 )}
 
                 {/* Bio */}
-                <p className="mt-4 text-white/90 leading-relaxed max-w-2xl">
+                <p className="mt-4 text-white/90 leading-relaxed max-w-lg">
                   {profile.bio ? profile.bio : "No bio provided"}
                 </p>
               </div>
