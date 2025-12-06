@@ -34,6 +34,12 @@ const BasicInfoSurvey = () => {
   const [error, setError] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     const checkBasicInfo = async () => {
@@ -219,6 +225,7 @@ const BasicInfoSurvey = () => {
 
       // Redirect to main survey
       navigate("/survey");
+      scrollToTop();
     } catch (error) {
       console.error("Error submitting basic info:", error);
 

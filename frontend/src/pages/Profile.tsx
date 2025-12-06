@@ -22,7 +22,12 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
-
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   useEffect(() => {
     const loadProfile = async () => {
       if (!currentUser) {
@@ -558,7 +563,10 @@ const Profile = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => navigate("/basic-info")}
+                onClick={() => {
+                  navigate("/basic-info");
+                  scrollToTop();
+                }}
                 className="bg-white text-red-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold text-lg transition-all shadow-lg hover:shadow-xl"
               >
                 Edit Profile

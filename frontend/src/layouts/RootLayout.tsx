@@ -98,7 +98,7 @@ const RootLayout = () => {
                   CURoommate
                 </Link>
               </div>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 text-sm mt-2">
                 Connecting Cornell students for better living experiences.
               </p>
             </div>
