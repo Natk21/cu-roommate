@@ -22,7 +22,8 @@
         "nodemon": "^2.0.21"
     },
     "scripts": {
-        "dev": "nodemon server.ts",
+        "dev": "nodemon dist/server.js",
         "build": "tsc"
     }
+
 }
