@@ -29,6 +29,7 @@ export type UserBasicInfo = {
   lastName: string;
   major: string;
   graduationYear: number;
+  bio?: string;
   profilePhotoURL?: string;
 };
 
@@ -169,6 +170,7 @@ export const getAllUsersBasicInfo = async (): Promise<
       lastName: user.lastName,
       major: surveysMap.get(user.userId)?.major || "Undeclared",
       graduationYear: user.graduationYear,
+      bio: user.bio,
       profilePhotoURL: user.profilePhotoURL, // ADD THIS LINE
     }));
   } catch (error) {
@@ -201,6 +203,7 @@ export const getAllUserMatchingInfo = async (): Promise<UserMatchingInfo[]> => {
         lastName: user.lastName,
         major: responses?.major || "Undeclared",
         graduationYear: user.graduationYear,
+        bio: user.bio,
         profilePhotoURL: user.profilePhotoURL,
 
         bedtime: responses?.bedtime,

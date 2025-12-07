@@ -25,4 +25,5 @@
         "dev": "nodemon dist/server.js",
         "build": "tsc"
     }
+
 }

@@ -29,20 +29,58 @@ const MatchScoreBadge = ({ score }: { score: number }) => {
   );
 };
 
+const getFirstSentence = (bio?: string) => {
+  if (!bio) return "";
+
+  const text = bio.trim();
+  if (!text) return "";
+
+  // Split into sentences while keeping decent punctuation handling
+  const sentences =
+    text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.map((s) => s.trim()) ?? [];
+
+  // Common short greetings to ignore
+  const greetingRegex =
+    /^(hi|hey|hello|yo|hiya|howdy|sup|what'?s up|whats up)[!.\s]*$/i;
+
+  const isTrivial = (s: string) => {
+    const cleaned = s.replace(/["'“”‘’]/g, "").trim();
+
+    // Skip tiny sentences (very likely greetings or filler)
+    if (cleaned.length <= 4) return true;
+
+    // Skip greeting-only sentences
+    if (greetingRegex.test(cleaned)) return true;
+
+    return false;
+  };
+
+  // Pick first non-trivial sentence, fallback to first sentence if all trivial
+  const firstUseful =
+    sentences.find((s) => !isTrivial(s)) ?? sentences[0] ?? text;
+
+  // Clamp length for UI
+  const maxLen = 140;
+  return firstUseful.length > maxLen
+    ? firstUseful.slice(0, maxLen).trim() + "…"
+    : firstUseful;
+};
+
+
 const MatchCard = ({ profile, lookingFor, score }: MatchCardProps) => {
-  const initials =
-    profile?.firstName?.[0] ? profile.firstName[0].toUpperCase() : "?";
+  const bioPreview = getFirstSentence(profile.bio);
 
   return (
-    <div
-      className="w-full bg-white rounded-2xl border border-gray-100
-                 shadow-sm hover:shadow-md transition-all duration-200
-                 overflow-hidden"
-    >
+    <div className="relative w-full bg-white rounded-2xl shadow-sm overflow-visible hover:shadow-md transition-shadow duration-300">
+      <div className="absolute bottom-12 right-6 z-10">
+        <div className="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-full w-20 h-20 flex items-center justify-center text-2xl font-bold shadow-lg border-4 border-white">
+          {Math.round(score)}
+        </div>
+      </div>
+
       <div className="flex flex-col md:flex-row">
-        {/* Image */}
-        <div className="md:w-56 lg:w-64 flex-shrink-0 bg-gray-100">
-          <div className="w-full aspect-square md:aspect-auto md:h-full overflow-hidden flex items-center justify-center">
+        <div className="md:w-64 flex-shrink-0">
+          <div className="h-full w-64 bg-gray-100 flex items-center justify-center overflow-hidden">
             {profile.profilePhotoURL ? (
               <img
                 src={profile.profilePhotoURL}
@@ -52,54 +90,53 @@ const MatchCard = ({ profile, lookingFor, score }: MatchCardProps) => {
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100">
                 <span className="text-6xl font-bold text-red-300">
-                  {initials}
+                  {profile.firstName[0].toUpperCase()}
                 </span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Content */}
         <div className="p-6 flex-1 flex flex-col">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">
+            <h2 className="text-2xl font-bold text-gray-900">
               {profile.firstName} {profile.lastName}
             </h2>
             {profile.major && (
-              <p className="text-base sm:text-lg text-gray-600 mt-1">
-                {profile.major}
+              <p className="text-lg text-gray-600 mt-1">{profile.major}</p>
+            )}
+          </div>
+
+          <div className="mt-5">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                I am looking for:
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {(lookingFor?.length ? lookingFor : ["good overall fit"]).map(
+                (point, index) => (
+                  <Tag key={index} label={point} />
+                )
+              )}
+            </div>
+
+            {bioPreview && (
+              <p className="mt-3 text-sm text-gray-600">
+                {bioPreview}
               </p>
             )}
           </div>
 
-          {/* Looking for */}
-          <div className="mt-4">
-            <p className="text-gray-800 font-medium mb-2">
-              I'm looking for someone who...
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {lookingFor.map((point, index) => (
-                <Tag key={index} label={point} />
-              ))}
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+          <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
             <Link
               to={`/profile/${profile.userId}`}
-              className="inline-flex items-center justify-center
-                         bg-red-600 hover:bg-red-700
-                         text-white px-5 sm:px-6 py-2.5
-                         rounded-lg font-medium
-                         transition-colors"
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors"
             >
               View Full Profile
             </Link>
-
-            <div className="flex items-center gap-2">
-              <MatchScoreBadge score={score} />
-            </div>
+            <div className="w-14 h-14" />
           </div>
         </div>
       </div>
