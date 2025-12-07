@@ -23,6 +23,35 @@ export interface SurveyDocument {
   submittedAt: string;
 }
 
+export type UserBasicInfo = {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  major: string;
+  graduationYear: number;
+  profilePhotoURL?: string;
+};
+
+export type UserMatchingInfo = UserBasicInfo & {
+  wakeUpTime?: string;
+  bedtime?: string;
+  sleepScheduleImportance?: number;
+  gender?: string;
+  genderPreference?: string;
+  noiseToleranceLevel?: number;
+  cleanliness?: string;
+  cleanlinessMatchImportance?: number;
+  workloadStyle?: string;
+  workloadMatchImportance?: number;
+  musicPreference?: string;
+  musicPreferenceImportance?: number;
+  desiredDorms?: string[];
+  roomType?: string;
+  hobbies?: string;
+};
+
+
+
 export const submitSurvey = async (
   userId: string,
   responses: SurveyResponse
@@ -142,6 +171,55 @@ export const getAllUsersBasicInfo = async (): Promise<
       graduationYear: user.graduationYear,
       profilePhotoURL: user.profilePhotoURL, // ADD THIS LINE
     }));
+  } catch (error) {
+    console.error("Error getting users:", error);
+    throw error;
+  }
+};
+
+
+//gets the user basic info + specific matching info for the display card
+export const getAllUserMatchingInfo = async (): Promise<UserMatchingInfo[]> => {
+  try {
+    const users = await getUsersFromUserService();
+
+    const surveysQuery = query(collection(db, SURVEYS_COLLECTION));
+    const surveysSnapshot = await getDocs(surveysQuery);
+
+    const surveysMap = new Map<string, any>();
+    surveysSnapshot.forEach((doc) => {
+      const data = doc.data();
+      surveysMap.set(data.userId, data.responses);
+    });
+
+    return users.map((user) => {
+      const responses = surveysMap.get(user.userId);
+
+      return {
+        userId: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        major: responses?.major || "Undeclared",
+        graduationYear: user.graduationYear,
+        profilePhotoURL: user.profilePhotoURL,
+
+        bedtime: responses?.bedtime,
+        wakeUpTime: responses?.wakeUpTime,
+        sleepScheduleImportance: responses?.sleepScheduleImportance,
+        gender: responses?.gender,
+        genderPreference: responses?.genderPreference,
+        noiseToleranceLevel: responses?.noiseToleranceLevel,
+        cleanliness: responses?.cleanliness,
+        cleanlinessMatchImportance: responses?.cleanlinessMatchImportance,
+        workloadStyle: responses?.workloadStyle,
+        workloadMatchImportance: responses?.workloadMatchImportance,
+        musicPreference: responses?.musicPreference,
+        musicPreferenceImportance: responses?.musicPreferenceImportance,
+        desiredDorms: responses?.desiredDorms,
+        roomType: responses?.roomType,
+        hobbies: responses?.hobbies,
+      };
+    });
   } catch (error) {
     console.error("Error getting users:", error);
     throw error;
